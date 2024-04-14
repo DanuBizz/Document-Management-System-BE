@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD CheckstyleConfiguration 1.2//EN"
+        "https://checkstyle.org/dtds/configuration_1_2.dtd">
+
+<module name="Checker">
+    <module name="TreeWalker">
+        <module name="ConstantName"/>
+        <module name="EmptyBlock"/>
+        <module name="UnusedLocalVariable"/>
+        <module name="DefaultComesLast"/>
+        <module name="RightCurly"/>
+        <module name="LeftCurly"/>
+        <module name="PackageName"/>
+        <module name="MethodName"/>
+        <module name="MemberName"/>
+        <module name="ParameterName"/>
+        <module name="TypeName"/>
+        <module name="UpperEll"/>
+    </module>
+    <!--<module name="LineLength">
+        <property name="max" value="120"/>
+        <property name="tabWidth" value="4"/>
+    </module>-->
+</module>
