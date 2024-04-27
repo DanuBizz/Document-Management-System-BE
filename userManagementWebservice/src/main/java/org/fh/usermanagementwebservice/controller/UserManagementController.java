@@ -6,6 +6,7 @@ import org.fh.usermanagementwebservice.model.User;
 import org.fh.usermanagementwebservice.service.UserManagementService;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
