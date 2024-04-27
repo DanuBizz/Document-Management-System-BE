@@ -1,10 +1,10 @@
 package org.fh.usermanagementwebservice.service;
 
 import lombok.extern.log4j.Log4j2;
-import net.inventorymanagement.usermanagementwebservice.dto.UserNameDTO;
-import net.inventorymanagement.usermanagementwebservice.model.User;
-import net.inventorymanagement.usermanagementwebservice.repository.TeamRepository;
-import net.inventorymanagement.usermanagementwebservice.repository.UserRepository;
+import org.fh.usermanagementwebservice.dto.UserNameDTO;
+import org.fh.usermanagementwebservice.model.User;
+import org.fh.usermanagementwebservice.repository.TeamRepository;
+import org.fh.usermanagementwebservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;

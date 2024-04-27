@@ -1,6 +1,6 @@
 package org.fh.usermanagementwebservice.repository;
 
-import net.inventorymanagement.usermanagementwebservice.model.User;
+import org.fh.usermanagementwebservice.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
