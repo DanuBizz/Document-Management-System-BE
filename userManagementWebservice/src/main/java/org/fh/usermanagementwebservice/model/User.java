@@ -34,12 +34,12 @@ public class User implements Comparable<User> {
     private LocalDateTime lastLogin;
     private boolean active;
     private boolean authUserManagement;
-    private boolean authInventoryManagement;
+    private boolean authDocumentManagement;
 
     public User() {
     }
 
-    public User(String userLogonName, String firstName, String lastName, String mailAddress, Team team, boolean teamLeader, boolean admin, boolean superAdmin, LocalDateTime lastLogin, boolean active, boolean authUserManagement, boolean authInventoryManagement) {
+    public User(String userLogonName, String firstName, String lastName, String mailAddress, Team team, boolean teamLeader, boolean admin, boolean superAdmin, LocalDateTime lastLogin, boolean active, boolean authUserManagement, boolean authDocumentManagement) {
         this.userLogonName = userLogonName;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -51,7 +51,7 @@ public class User implements Comparable<User> {
         this.lastLogin = lastLogin;
         this.active = active;
         this.authUserManagement = authUserManagement;
-        this.authInventoryManagement = authInventoryManagement;
+        this.authDocumentManagement = authDocumentManagement;
     }
 
     public User(String userLogonName, String firstName, String lastName, String mailAddress, boolean active) {
