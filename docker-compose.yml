@@ -15,3 +15,16 @@ services:
       - ./data:/var/lib/mysql
     ports:
       - 3306:3306
+
+  mariadb_authentication:
+    image: mariadb:10.5
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: authenticationDB
+      MYSQL_USER: auth-dev
+      MYSQL_PASSWORD: authDB-pw
+    volumes:
+      - ./data_authentication:/var/lib/mysql
+    ports:
+      - "3307:3306"
