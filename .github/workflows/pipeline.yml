@@ -30,7 +30,7 @@ jobs:
           cache: maven
       # Run Linter Checkstyle
       - name: Checkstyle
-        run: mvn checkstyle:check
+        run: mvn checkstyle:checkstyle-aggregate
       # Run Linter PMD
       - name : PMD
         run : mvn pmd:check
