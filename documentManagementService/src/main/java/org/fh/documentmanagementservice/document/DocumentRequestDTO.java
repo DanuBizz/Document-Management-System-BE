@@ -3,7 +3,6 @@ package org.fh.documentmanagementservice.document;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.Set;
 
 /**
  * Data Transfer Object (DTO) for Document requests.

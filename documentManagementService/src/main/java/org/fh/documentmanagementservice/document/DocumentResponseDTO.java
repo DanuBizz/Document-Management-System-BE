@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
-
 /**
  * Data Transfer Object (DTO) for Document responses.
  * This class is used to transfer data between the server and the client during HTTP responses.
