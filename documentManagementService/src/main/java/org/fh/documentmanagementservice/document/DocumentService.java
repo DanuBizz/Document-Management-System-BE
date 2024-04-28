@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-
 /**
  * Service class for Document related operations.
  * This class handles the business logic for the Document entity.

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.fh.documentmanagementservice.category.Category;
+
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -20,39 +22,24 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    /**
-     * Unique identifier for the user.
-     * It is automatically generated and managed by the database.
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Username of the user.
-     * It is unique and cannot be null.
-     */
     @Column(nullable = false, unique = true)
     private String username;
 
-    /**
-     * Email of the user.
-     * It is unique and cannot be null.
-     */
     @Column(nullable = false, unique = true)
     private String email;
 
-    /**
-     * Boolean flag indicating if the user is an admin.
-     * It cannot be null.
-     */
     @Column(nullable = false)
     private Boolean isAdmin;
 
-    /**
-     * Set of categories associated with the user.
-     * It represents the categories that are associated with the user.
-     */
-    @ManyToMany(mappedBy = "users")
-    private Set<Category> categories;
+    @ManyToMany
+    @JoinTable(
+            name = "user_category",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories = new HashSet<>();  // Initialized to empty
 }

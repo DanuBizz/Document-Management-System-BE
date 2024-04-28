@@ -1,4 +1,4 @@
-package org.fh.documentmanagementservice.userDocument;
+package org.fh.documentmanagementservice.userDocumentRead;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -10,7 +10,7 @@ import java.util.Optional;
  * This interface extends JpaRepository and includes methods for UserDocument related database operations.
  */
 @Repository
-public interface UserDocumentRepository extends JpaRepository<UserDocument, Long> {
+public interface UserDocumentReadRepository extends JpaRepository<UserDocumentRead, Long> {
 
     /**
      * Finds a UserDocument by User ID and Document ID.
@@ -19,5 +19,5 @@ public interface UserDocumentRepository extends JpaRepository<UserDocument, Long
      * @param documentId The ID of the Document.
      * @return An Optional of UserDocument.
      */
-    Optional<UserDocument> findByUserIdAndDocumentId(Long userId, Long documentId);
+    Optional<UserDocumentRead> findByUserIdAndDocumentId(Long userId, Long documentId);
 }

@@ -1,10 +1,13 @@
 package org.fh.documentmanagementservice.category;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller for Category related operations.
@@ -14,66 +17,47 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/categories")
 public class CategoryController {
 
-    /**
-     * Service for Category related operations.
-     * It is automatically injected by Spring Boot.
-     */
+    private final CategoryService categoryService;
+
     @Autowired
-    private CategoryService categoryService;
-
-    /**
-     * Endpoint for creating a new Category.
-     * It accepts a POST request with a CategoryRequestDTO object in the request body.
-     * @param categoryRequestDTO The request body containing the details of the new Category.
-     * @return The created CategoryResponseDTO object.
-     */
-    @PostMapping
-    public CategoryResponseDTO createCategory(@RequestBody CategoryRequestDTO categoryRequestDTO) {
-        return categoryService.createCategory(categoryRequestDTO);
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
-    /**
-     * Endpoint for retrieving all Categories.
-     * It accepts a GET request and returns a Page of CategoryResponseDTO objects.
-     * @param pageable The pagination information.
-     * @return A ResponseEntity containing a Page of CategoryResponseDTO objects.
-     */
     @GetMapping
-    public ResponseEntity<Page<CategoryResponseDTO>> getAllCategories(Pageable pageable) {
-        Page<CategoryResponseDTO> categories = categoryService.getAllCategories(pageable);
-        return ResponseEntity.ok(categories);
+    public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
+        List<Category> categories = categoryService.getAllCategories();
+        List<CategoryResponseDTO> categoryResponseDTOs = categories.stream()
+                .map(category -> new CategoryResponseDTO(category.getId(), category.getName()))
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(categoryResponseDTOs, HttpStatus.OK);
     }
 
-    /**
-     * Endpoint for retrieving a Category by its ID.
-     * It accepts a GET request with the ID as a path variable.
-     * @param id The ID of the Category to retrieve.
-     * @return The CategoryResponseDTO object of the retrieved Category.
-     */
     @GetMapping("/{id}")
-    public CategoryResponseDTO getCategoryById(@PathVariable Long id) {
-        return categoryService.getCategoryById(id);
+    public ResponseEntity<CategoryResponseDTO> getCategoryById(@PathVariable Long id) {
+        Category category = categoryService.getCategoryById(id)
+                .orElseThrow(ResourceNotFoundException::new);
+        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(category.getId(), category.getName());
+        return new ResponseEntity<>(categoryResponseDTO, HttpStatus.OK);
     }
 
-    /**
-     * Endpoint for updating a Category.
-     * It accepts a PUT request with the ID as a path variable and a CategoryRequestDTO object in the request body.
-     * @param id The ID of the Category to update.
-     * @param categoryRequestDTO The request body containing the new details of the Category.
-     * @return The CategoryResponseDTO object of the updated Category.
-     */
+    @PostMapping
+    public ResponseEntity<CategoryResponseDTO> createCategory(@RequestBody CategoryRequestDTO categoryRequestDTO) {
+        Category category = categoryService.createCategory(categoryRequestDTO);
+        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(category.getId(), category.getName());
+        return new ResponseEntity<>(categoryResponseDTO, HttpStatus.CREATED);
+    }
+
     @PutMapping("/{id}")
-    public CategoryResponseDTO updateCategory(@PathVariable Long id, @RequestBody CategoryRequestDTO categoryRequestDTO) {
-        return categoryService.updateCategory(id, categoryRequestDTO);
+    public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryRequestDTO categoryRequestDTO) {
+        Category category = categoryService.updateCategory(id, categoryRequestDTO);
+        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(category.getId(), category.getName());
+        return new ResponseEntity<>(categoryResponseDTO, HttpStatus.OK);
     }
 
-    /**
-     * Endpoint for deleting a Category.
-     * It accepts a DELETE request with the ID as a path variable.
-     * @param id The ID of the Category to delete.
-     */
     @DeleteMapping("/{id}")
-    public void deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
