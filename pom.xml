@@ -13,6 +13,7 @@
         <module>userManagementWebservice</module>
         <module>userControlWebservice</module>
         <module>discoveryServer</module>
+        <module>apiGatewayLoadBalancer</module>
     </modules>
     <properties>
         <java.version>17</java.version>
