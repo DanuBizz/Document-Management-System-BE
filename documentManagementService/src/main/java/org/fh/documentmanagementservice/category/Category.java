@@ -2,6 +2,10 @@ package org.fh.documentmanagementservice.category;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.fh.documentmanagementservice.user.User;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents a Category entity in the database.
@@ -20,4 +24,12 @@ public class Category {
 
     @Column(nullable = false, unique = true)
     private String name;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_category",
+            joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> users = new HashSet<>();
 }

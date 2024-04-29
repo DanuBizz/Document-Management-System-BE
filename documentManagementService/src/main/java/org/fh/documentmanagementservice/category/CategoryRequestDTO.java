@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 /**
  * Data Transfer Object (DTO) for Category requests.
  * This class is used to transfer data between the client and the server during HTTP requests.
@@ -14,4 +16,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CategoryRequestDTO {
     private String name;
+    private Set<Long> userIds;
 }

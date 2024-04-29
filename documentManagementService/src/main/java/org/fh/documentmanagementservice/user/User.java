@@ -5,10 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.fh.documentmanagementservice.category.Category;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Entity class for User.
@@ -34,12 +30,4 @@ public class User {
 
     @Column(nullable = false)
     private Boolean isAdmin;
-
-    @ManyToMany
-    @JoinTable(
-            name = "user_category",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private Set<Category> categories = new HashSet<>();  // Initialized to empty
 }

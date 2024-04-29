@@ -1,5 +1,7 @@
 package org.fh.documentmanagementservice.category;
 
+import org.fh.documentmanagementservice.user.User;
+import org.fh.documentmanagementservice.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,7 +9,10 @@ import org.springframework.stereotype.Service;
 import org.fh.documentmanagementservice.exception.ResourceNotFoundException;
 
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service for Category related operations.
@@ -17,10 +22,12 @@ import java.util.Optional;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;  // Assuming there's a UserRepository handling User entities
 
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, UserRepository userRepository) {
         this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
     }
 
     public Page<Category> getAllCategories(Pageable pageable) {
@@ -34,6 +41,9 @@ public class CategoryService {
     public Category createCategory(CategoryRequestDTO categoryRequestDTO) {
         Category category = new Category();
         category.setName(categoryRequestDTO.getName());
+        List<User> userList = userRepository.findAllById(categoryRequestDTO.getUserIds());
+        Set<User> users = new HashSet<>(userList);
+        category.setUsers(users);
         return categoryRepository.save(category);
     }
 
@@ -41,6 +51,9 @@ public class CategoryService {
         Category category = getCategoryById(id)
                 .orElseThrow(ResourceNotFoundException::new);
         category.setName(categoryRequestDTO.getName());
+        List<User> userList = userRepository.findAllById(categoryRequestDTO.getUserIds());
+        Set<User> users = new HashSet<>(userList);
+        category.setUsers(users);
         return categoryRepository.save(category);
     }
 

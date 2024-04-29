@@ -22,7 +22,6 @@ public class UserService {
         user.setUsername(userRequestDTO.getUsername());
         user.setEmail(userRequestDTO.getEmail());
         user.setIsAdmin(userRequestDTO.getIsAdmin());
-        user.setCategories(userRequestDTO.getCategories());
 
         User savedUser = userRepository.save(user);
 
@@ -52,7 +51,6 @@ public class UserService {
             user.setUsername(userRequestDTO.getUsername());
             user.setEmail(userRequestDTO.getEmail());
             user.setIsAdmin(userRequestDTO.getIsAdmin());
-            user.setCategories(userRequestDTO.getCategories());
 
             User updatedUser = userRepository.save(user);
 
@@ -76,7 +74,6 @@ public class UserService {
         userResponseDTO.setUsername(user.getUsername());
         userResponseDTO.setEmail(user.getEmail());
         userResponseDTO.setIsAdmin(user.getIsAdmin());
-        userResponseDTO.setCategories(user.getCategories());
 
         return userResponseDTO;
     }
