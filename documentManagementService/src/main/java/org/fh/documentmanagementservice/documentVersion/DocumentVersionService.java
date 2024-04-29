@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 @Service
 public class DocumentVersionService {
 
+    private static final String FILE_DIRECTORY = "C:\\Users\\Hasnat\\Downloads\\KBB-test\\";
+
     @Autowired
     private DocumentVersionRepository documentVersionRepository;
 
@@ -27,6 +29,8 @@ public class DocumentVersionService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    // we need the
 
     public DocumentVersionResponseDTO createDocumentVersion(DocumentVersionRequestDTO dto) throws IOException {
         Document document = documentRepository.findById(dto.getDocumentId())
@@ -54,8 +58,6 @@ public class DocumentVersionService {
             // Generate a unique filename in case of non-unique file names uploaded
             String originalFilename = file.getOriginalFilename();
             String storedFilename = UUID.randomUUID() + "-" + originalFilename;
-            // Adjusted path for file storage
-            String FILE_DIRECTORY = "C:\\Users\\Hasnat\\Downloads\\KBB-test\\";
             Path destinationFilePath = Paths.get(FILE_DIRECTORY + storedFilename);
             file.transferTo(destinationFilePath);
             return destinationFilePath.toString();

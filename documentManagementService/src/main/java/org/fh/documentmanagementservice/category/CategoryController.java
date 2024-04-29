@@ -1,13 +1,12 @@
 package org.fh.documentmanagementservice.category;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Controller for Category related operations.
@@ -25,12 +24,10 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
-        List<Category> categories = categoryService.getAllCategories();
-        List<CategoryResponseDTO> categoryResponseDTOs = categories.stream()
-                .map(category -> new CategoryResponseDTO(category.getId(), category.getName()))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(categoryResponseDTOs, HttpStatus.OK);
+    public ResponseEntity<Page<CategoryResponseDTO>> getAllCategories(Pageable pageable) {
+        Page<Category> categoryPage = categoryService.getAllCategories(pageable);
+        Page<CategoryResponseDTO> dtoPage = categoryPage.map(category -> new CategoryResponseDTO(category.getId(), category.getName()));
+        return ResponseEntity.ok(dtoPage);
     }
 
     @GetMapping("/{id}")

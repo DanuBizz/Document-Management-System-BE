@@ -1,12 +1,12 @@
 package org.fh.documentmanagementservice.document;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Controller class for Document related operations.
@@ -24,9 +24,9 @@ public class DocumentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Document>> getAllDocuments() {
-        List<Document> documents = documentService.getAllDocuments();
-        return new ResponseEntity<>(documents, HttpStatus.OK);
+    public ResponseEntity<Page<Document>> getAllDocuments(Pageable pageable) {
+        Page<Document> documentPage = documentService.getAllDocuments(pageable);
+        return ResponseEntity.ok(documentPage);
     }
 
     @GetMapping("/{id}")

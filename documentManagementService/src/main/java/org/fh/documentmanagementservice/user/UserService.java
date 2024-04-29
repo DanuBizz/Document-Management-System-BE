@@ -1,11 +1,11 @@
 package org.fh.documentmanagementservice.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -29,12 +29,9 @@ public class UserService {
         return convertToUserResponseDTO(savedUser);
     }
 
-    public List<UserResponseDTO> getAllUsers() {
-        List<User> users = userRepository.findAll();
-
-        return users.stream()
-                .map(this::convertToUserResponseDTO)
-                .collect(Collectors.toList());
+    public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
+        Page<User> userPage = userRepository.findAll(pageable);
+        return userPage.map(this::convertToUserResponseDTO);
     }
 
     public UserResponseDTO getUserById(Long id) {

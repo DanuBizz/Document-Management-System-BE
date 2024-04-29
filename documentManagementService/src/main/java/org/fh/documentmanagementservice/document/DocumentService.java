@@ -1,10 +1,11 @@
 package org.fh.documentmanagementservice.document;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -21,8 +22,8 @@ public class DocumentService {
         this.documentRepository = documentRepository;
     }
 
-    public List<Document> getAllDocuments() {
-        return documentRepository.findAll();
+    public Page<Document> getAllDocuments(Pageable pageable) {
+        return documentRepository.findAll(pageable);
     }
 
     public Optional<Document> getDocumentById(Long id) {
