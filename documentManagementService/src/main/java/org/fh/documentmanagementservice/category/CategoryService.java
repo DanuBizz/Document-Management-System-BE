@@ -3,8 +3,8 @@ package org.fh.documentmanagementservice.category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.fh.documentmanagementservice.exception.ResourceNotFoundException;
 
 
 import java.util.Optional;

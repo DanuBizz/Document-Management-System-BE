@@ -4,7 +4,10 @@ import org.fh.documentmanagementservice.category.Category;
 import org.fh.documentmanagementservice.category.CategoryRepository;
 import org.fh.documentmanagementservice.document.Document;
 import org.fh.documentmanagementservice.document.DocumentRepository;
+import org.fh.documentmanagementservice.document.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
@@ -30,10 +33,17 @@ public class DocumentVersionService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    // we need the
+    @Autowired
+    private DocumentService documentService;
+
+
+    public Page<DocumentVersion> getAllDocumentVersions(Pageable pageable) {
+        return documentVersionRepository.findAll(pageable);
+    }
+
 
     public DocumentVersionResponseDTO createDocumentVersion(DocumentVersionRequestDTO dto) throws IOException {
-        Document document = documentRepository.findById(dto.getDocumentId())
+        Document document = documentRepository.findByName(dto.getName())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid document ID"));
 
         String storedFilePath = storeFile(dto.getFile());
@@ -80,7 +90,7 @@ public class DocumentVersionService {
         });
     }
 
-    private DocumentVersionResponseDTO convertToResponseDTO(DocumentVersion documentVersion) {
+    public DocumentVersionResponseDTO convertToResponseDTO(DocumentVersion documentVersion) {
         Set<String> categoryNames = documentVersion.getCategories().stream()
                 .map(Category::getName)
                 .collect(Collectors.toSet());

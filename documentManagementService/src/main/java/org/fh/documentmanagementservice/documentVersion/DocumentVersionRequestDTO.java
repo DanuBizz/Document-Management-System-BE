@@ -14,7 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class DocumentVersionRequestDTO {
 
-    private Long documentId;
+    private String name;
     private MultipartFile file;  // File received from the frontend
     private LocalDateTime timestamp;  // Timestamp from the frontend, if any
     private Set<Long> categoryIds;  // Set of category IDs to link
