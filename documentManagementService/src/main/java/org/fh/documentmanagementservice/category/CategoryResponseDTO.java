@@ -17,5 +17,5 @@ import java.util.Set;
 public class CategoryResponseDTO {
     private Long id;
     private String name;
-    private Set<Long> userIds;
+    private Set<String> userNames; // Changed from userIds to userNames
 }

@@ -20,6 +20,7 @@ public class DocumentVersionController {
         this.documentVersionService = documentVersionService;
     }
 
+
     @GetMapping
     public ResponseEntity<Page<DocumentVersionResponseDTO>> getAllDocumentVersions(Pageable pageable) {
         Page<DocumentVersion> documentVersionPage = documentVersionService.getAllDocumentVersions(pageable);
