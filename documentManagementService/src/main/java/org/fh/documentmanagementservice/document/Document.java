@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.fh.documentmanagementservice.documentVersion.DocumentVersion;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Entity class for Document.
@@ -18,12 +22,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Document {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "document_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
+
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
+    private Set<DocumentVersion> versions = new HashSet<>();
 }

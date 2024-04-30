@@ -3,6 +3,11 @@ package org.fh.documentmanagementservice.document;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.fh.documentmanagementservice.documentVersion.DocumentVersion;
+
+import java.util.HashSet;
+import java.util.Set;
+
 
 /**
  * Data Transfer Object (DTO) for Document responses.
@@ -13,16 +18,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DocumentResponseDTO {
-    /**
-     * Unique identifier for the document.
-     * It is automatically generated and managed by the database.
-     */
-    private Long id;
 
-    /**
-     * Name of the document.
-     * It is used to identify the document.
-     */
+    private Long id;
     private String name;
+    private Set<DocumentVersion> documentVersions= new HashSet<>();
 
 }

@@ -1,5 +1,6 @@
 package org.fh.documentmanagementservice.user;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,66 +15,41 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UserController {
 
-    /**
-     * Service for User related operations.
-     * It is automatically injected by Spring Boot.
-     */
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    /**
-     * Retrieves all Users.
-     * It accepts a Pageable object and returns a ResponseEntity with a Page of UserResponseDTO objects.
-     * @param pageable The pagination information.
-     * @return A ResponseEntity with a Page of UserResponseDTO objects.
-     */
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO userRequestDTO) {
+        UserResponseDTO userResponseDTO = userService.createUser(userRequestDTO);
+        return ResponseEntity.ok(userResponseDTO);
+    }
+
     @GetMapping
     public ResponseEntity<Page<UserResponseDTO>> getAllUsers(Pageable pageable) {
-        Page<UserResponseDTO> users = userService.getAllUsers(pageable);
-        return ResponseEntity.ok(users);
+        Page<UserResponseDTO> userPage = userService.getAllUsers(pageable);
+        return ResponseEntity.ok(userPage);
     }
 
-    /**
-     * Creates a new User.
-     * It accepts a UserRequestDTO object and returns a UserResponseDTO object.
-     * @param userRequestDTO The request object containing the details of the new User.
-     * @return The response object of the created User.
-     */
-    @PostMapping
-    public UserResponseDTO createUser(@RequestBody UserRequestDTO userRequestDTO) {
-        return userService.createUser(userRequestDTO);
-    }
 
-    /**
-     * Retrieves a User by its ID.
-     * It accepts the ID of the User and returns a UserResponseDTO object.
-     * @param id The ID of the User to retrieve.
-     * @return The UserResponseDTO object of the retrieved User.
-     */
     @GetMapping("/{id}")
-    public UserResponseDTO getUser(@PathVariable Long id) {
-        return userService.getUser(id);
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
+        UserResponseDTO userResponseDTO = userService.getUserById(id);
+        return ResponseEntity.ok(userResponseDTO);
     }
 
-    /**
-     * Updates a User.
-     * It accepts the ID of the User and a UserRequestDTO object, and returns a UserResponseDTO object.
-     * @param id The ID of the User to update.
-     * @param userRequestDTO The request object containing the new details of the User.
-     * @return The UserResponseDTO object of the updated User.
-     */
     @PutMapping("/{id}")
-    public UserResponseDTO updateUser(@PathVariable Long id, @RequestBody UserRequestDTO userRequestDTO) {
-        return userService.updateUser(id, userRequestDTO);
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserRequestDTO userRequestDTO) {
+        UserResponseDTO userResponseDTO = userService.updateUser(id, userRequestDTO);
+        return ResponseEntity.ok(userResponseDTO);
     }
 
-    /**
-     * Deletes a User.
-     * It accepts the ID of the User to delete.
-     * @param id The ID of the User to delete.
-     */
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }

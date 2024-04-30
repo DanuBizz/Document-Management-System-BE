@@ -1,4 +1,4 @@
-package org.fh.documentmanagementservice.docVersion;
+package org.fh.documentmanagementservice.documentVersion;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,32 +21,35 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DocVersion {
-
+public class DocumentVersion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "version_id")
     private Long id;
-
-    @Column(name = "file_path", nullable = false)
-    private String filePath;
-
-    @Column(name = "is_visible", nullable = false)
-    private boolean isVisible;
-
-    @Column(name = "is_read", nullable = false)
-    private boolean isRead;
-
-    @Column(name = "is_latest", nullable = false)
-    private boolean isLatest;
-
-    @ManyToMany
-    private Set<Category> categories;
 
     @ManyToOne
     @JoinColumn(name = "document_id", nullable = false)
     private Document document;
 
-    @Column(name = "timestamp", nullable = false)
+    @Column(nullable = false)
+    private String filepath;
+
+    @Column(nullable = false)
     private LocalDateTime timestamp;
+
+    @ManyToMany
+    @JoinTable(
+            name = "document_version_category",
+            joinColumns = @JoinColumn(name = "document_version_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories;
+
+    @Column(nullable = false)
+    private Boolean isRead = false;
+
+    @Column(nullable = false)
+    private Boolean isLatest = false;
+
+    @Column(nullable = false)
+    private Boolean isVisible = true;
 }
