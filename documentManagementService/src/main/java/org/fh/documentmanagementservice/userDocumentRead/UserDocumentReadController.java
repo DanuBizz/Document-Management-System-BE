@@ -7,15 +7,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user-documents")
 public class UserDocumentReadController {
 
-    private final UserDocumentService userDocumentService;
+    private final UserDocumentReadService userDocumentReadService;
 
-    public UserDocumentReadController(UserDocumentService userDocumentService) {
-        this.userDocumentService = userDocumentService;
+    public UserDocumentReadController(UserDocumentReadService userDocumentReadService) {
+        this.userDocumentReadService = userDocumentReadService;
     }
 
     @PostMapping("/mark-as-read")
     public ResponseEntity<UserDocumentReadResponseDTO> markDocumentAsRead(@RequestBody UserDocumentReadRequestDTO request) {
-        UserDocumentReadResponseDTO response = userDocumentService.markDocumentAsRead(request);
+        UserDocumentReadResponseDTO response = userDocumentReadService.markDocumentAsRead(request);
         return ResponseEntity.ok(response);
     }
 }

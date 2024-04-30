@@ -70,7 +70,7 @@ public class DocumentVersionService {
         return convertToResponseDTO(documentVersionRepository.save(documentVersion));
     }
 
-    private String storeFile(MultipartFile file) throws IOException {
+    public String storeFile(MultipartFile file) throws IOException {
         if (!file.isEmpty()) {
             // Generate a unique filename in case of non-unique file names uploaded
             String originalFilename = file.getOriginalFilename();
@@ -83,14 +83,14 @@ public class DocumentVersionService {
         }
     }
 
-    private Set<Category> collectCategories(Set<Long> categoryIds) {
+    public Set<Category> collectCategories(Set<Long> categoryIds) {
         return categoryIds.stream()
                 .map(id -> categoryRepository.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException("Invalid category ID")))
                 .collect(Collectors.toSet());
     }
 
-    private void updateLatestVersionFlag(Document document) {
+    public void updateLatestVersionFlag(Document document) {
         document.getVersions().forEach(v -> {
             v.setIsLatest(false);
             documentVersionRepository.save(v);

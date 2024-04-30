@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * This class handles the business logic for the UserDocument entity.
  */
 @Service
-public class UserDocumentService {
+public class UserDocumentReadService {
 
     @Autowired
     private UserRepository userRepository;
