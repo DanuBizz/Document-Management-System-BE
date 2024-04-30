@@ -41,6 +41,13 @@ public class DocumentVersionService {
         return documentVersionRepository.findAll(pageable);
     }
 
+    public DocumentVersionResponseDTO getDocumentVersion(Long id) {
+        DocumentVersion documentVersion = documentVersionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid document version ID"));
+
+        return convertToResponseDTO(documentVersion);
+    }
+
 
     public DocumentVersionResponseDTO createDocumentVersion(DocumentVersionRequestDTO dto) throws IOException {
         Document document = documentRepository.findByName(dto.getName())
@@ -63,7 +70,7 @@ public class DocumentVersionService {
         return convertToResponseDTO(documentVersionRepository.save(documentVersion));
     }
 
-    private String storeFile(MultipartFile file) throws IOException {
+    public String storeFile(MultipartFile file) throws IOException {
         if (!file.isEmpty()) {
             // Generate a unique filename in case of non-unique file names uploaded
             String originalFilename = file.getOriginalFilename();
@@ -76,14 +83,14 @@ public class DocumentVersionService {
         }
     }
 
-    private Set<Category> collectCategories(Set<Long> categoryIds) {
+    public Set<Category> collectCategories(Set<Long> categoryIds) {
         return categoryIds.stream()
                 .map(id -> categoryRepository.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException("Invalid category ID")))
                 .collect(Collectors.toSet());
     }
 
-    private void updateLatestVersionFlag(Document document) {
+    public void updateLatestVersionFlag(Document document) {
         document.getVersions().forEach(v -> {
             v.setIsLatest(false);
             documentVersionRepository.save(v);
@@ -95,9 +102,11 @@ public class DocumentVersionService {
                 .map(Category::getName)
                 .collect(Collectors.toSet());
 
+        String documentName = documentVersion.getDocument().getName();
+
         return DocumentVersionResponseDTO.builder()
                 .id(documentVersion.getId())
-                .documentId(documentVersion.getDocument().getId())
+                .documentName(documentName)
                 .filepath(documentVersion.getFilepath())
                 .timestamp(documentVersion.getTimestamp())
                 .categoryNames(categoryNames)
@@ -105,13 +114,6 @@ public class DocumentVersionService {
                 .isLatest(documentVersion.getIsLatest())
                 .isVisible(documentVersion.getIsVisible())
                 .build();
-    }
-
-    public DocumentVersionResponseDTO getDocumentVersion(Long id) {
-        DocumentVersion documentVersion = documentVersionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid document version ID"));
-
-        return convertToResponseDTO(documentVersion);
     }
 }
 

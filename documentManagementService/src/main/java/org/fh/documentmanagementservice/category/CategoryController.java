@@ -30,7 +30,7 @@ public class CategoryController {
     public ResponseEntity<Page<CategoryResponseDTO>> getAllCategories(Pageable pageable) {
         Page<Category> categoryPage = categoryService.getAllCategories(pageable);
         Page<CategoryResponseDTO> dtoPage = categoryPage.map(category ->
-                new CategoryResponseDTO(category.getId(), category.getName(), category.getUsers().stream().map(User::getId).collect(Collectors.toSet())));
+                new CategoryResponseDTO(category.getId(), category.getName(), category.getUsers().stream().map(User::getUsername).collect(Collectors.toSet())));
         return ResponseEntity.ok(dtoPage);
     }
 
@@ -39,7 +39,7 @@ public class CategoryController {
         Category category = categoryService.getCategoryById(id)
                 .orElseThrow(ResourceNotFoundException::new);
         CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(
-                category.getId(), category.getName(), category.getUsers().stream().map(User::getId).collect(Collectors.toSet()));
+                category.getId(), category.getName(), category.getUsers().stream().map(User::getUsername).collect(Collectors.toSet()));
         return new ResponseEntity<>(categoryResponseDTO, HttpStatus.OK);
     }
 
@@ -47,7 +47,7 @@ public class CategoryController {
     public ResponseEntity<CategoryResponseDTO> createCategory(@RequestBody CategoryRequestDTO categoryRequestDTO) {
         Category category = categoryService.createCategory(categoryRequestDTO);
         CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(
-                category.getId(), category.getName(), category.getUsers().stream().map(User::getId).collect(Collectors.toSet()));
+                category.getId(), category.getName(), category.getUsers().stream().map(User::getUsername).collect(Collectors.toSet()));
         return new ResponseEntity<>(categoryResponseDTO, HttpStatus.CREATED);
     }
 
@@ -55,7 +55,7 @@ public class CategoryController {
     public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryRequestDTO categoryRequestDTO) {
         Category category = categoryService.updateCategory(id, categoryRequestDTO);
         CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(
-                category.getId(), category.getName(), category.getUsers().stream().map(User::getId).collect(Collectors.toSet()));
+                category.getId(), category.getName(), category.getUsers().stream().map(User::getUsername).collect(Collectors.toSet()));
         return new ResponseEntity<>(categoryResponseDTO, HttpStatus.OK);
     }
 

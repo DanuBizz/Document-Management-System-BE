@@ -15,7 +15,7 @@ import java.util.Set;
 public class DocumentVersionResponseDTO {
 
     private Long id;
-    private Long documentId;
+    private String documentName;
     private String filepath;
     private LocalDateTime timestamp;
     private Set<String> categoryNames;  // Using category names for more readable responses
