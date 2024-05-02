@@ -154,6 +154,13 @@ public class DocumentVersionService {
                 .build();
     }
 
+    public DocumentVersionResponseDTO toggleVisibility(Long id) {
+        DocumentVersion documentVersion = documentVersionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid document version ID"));
+
+        documentVersion.setIsVisible(!documentVersion.getIsVisible());
+        return convertToResponseDTO(documentVersionRepository.save(documentVersion));
+    }
 }
 
 

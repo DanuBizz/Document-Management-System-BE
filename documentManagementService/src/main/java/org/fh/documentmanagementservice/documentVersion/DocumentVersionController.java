@@ -85,4 +85,10 @@ public class DocumentVersionController {
         DocumentVersionResponseDTO responseDTO = documentVersionService.getDocumentVersion(id);
         return ResponseEntity.ok(responseDTO);
     }
+
+    @PutMapping("/{id}/toggle-visibility")
+    public ResponseEntity<DocumentVersionResponseDTO> toggleDocumentVersionVisibility(@PathVariable Long id) {
+        DocumentVersionResponseDTO responseDTO = documentVersionService.toggleVisibility(id);
+        return ResponseEntity.ok(responseDTO);
+    }
 }
