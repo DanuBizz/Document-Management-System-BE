@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/documentVersions")
@@ -28,6 +30,43 @@ public class DocumentVersionController {
         return ResponseEntity.ok(dtoPage);
     }
 
+    @GetMapping("/latest-with-associated-versions")
+    public ResponseEntity<Page<DocumentVersionResponseDTO>> getLatestDocumentVersions(Pageable pageable) {
+
+        // Get the latest version of the documents
+        Page<DocumentVersion> documentVersionPage = documentVersionService.getLatestDocumentVersions(pageable);
+        Page<DocumentVersionResponseDTO> dtoPage = documentVersionPage.map(documentVersionService::convertToResponseDTO);
+
+        // Create a list to store old version DTOs
+        List<DocumentOldVersionResponseDTO> oldVersionDTOs = new ArrayList<>();
+
+        // Iterate through the latest version DTOs to fetch and add old versions
+        for (DocumentVersionResponseDTO dto : dtoPage.getContent()) {
+            // Fetch non-latest versions for each document
+            Page<DocumentVersion> nonLatestVersionsPage = documentVersionService.getNonLatestDocumentVersions(dto.getDocumentName());
+            // Convert non-latest versions to DTOs
+            List<DocumentOldVersionResponseDTO> oldVersionDTOList = nonLatestVersionsPage
+                    .map(documentVersionService::convertToOldResponseDTO)
+                    .getContent();
+            // Add old version DTOs to the list
+            oldVersionDTOs.addAll(oldVersionDTOList);
+            // Set the old versions array for the current latest version DTO
+            dto.setOldVersions(oldVersionDTOList.toArray(new DocumentOldVersionResponseDTO[0]));
+        }
+
+        return ResponseEntity.ok(dtoPage);
+    }
+
+/*
+
+    @GetMapping("/non-latest-versions/{documentName}")
+    public ResponseEntity<Page<DocumentOldVersionResponseDTO>> getNonLatestDocumentVersions(Pageable pageable ,@PathVariable String documentName) {
+        Page<DocumentVersion> documentVersionPage = documentVersionService.getNonLatestDocumentVersions(documentName, pageable);
+        Page<DocumentOldVersionResponseDTO> dtoPage = documentVersionPage.map(documentVersionService::convertToOldResponseDTO);
+
+        return ResponseEntity.ok(dtoPage);
+    }
+*/
 
     @PostMapping
     public ResponseEntity<DocumentVersionResponseDTO> uploadDocumentVersion(@ModelAttribute DocumentVersionRequestDTO requestDTO) {

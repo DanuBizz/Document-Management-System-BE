@@ -7,7 +7,9 @@ import org.fh.documentmanagementservice.document.DocumentRepository;
 import org.fh.documentmanagementservice.document.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
@@ -22,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 public class DocumentVersionService {
 
-    private static final String FILE_DIRECTORY = "C:\\Users\\Hasnat\\Downloads\\KBB-test\\";
+    private static final String FILE_DIRECTORY = "C:\\Users\\mike\\KBB-test";
 
     @Autowired
     private DocumentVersionRepository documentVersionRepository;
@@ -40,6 +42,22 @@ public class DocumentVersionService {
     public Page<DocumentVersion> getAllDocumentVersions(Pageable pageable) {
         return documentVersionRepository.findAll(pageable);
     }
+
+    public Page<DocumentVersion> getLatestDocumentVersions(Pageable pageable) {
+        return documentVersionRepository.findByIsLatestTrue(pageable);
+
+
+    }
+
+    public Page<DocumentVersion> getNonLatestDocumentVersions(String documentName) {
+        // Create a pageable object for fetching non-latest versions
+        Pageable nonLatestPageable = PageRequest.of(0, Integer.MAX_VALUE);
+        Sort sort = Sort.by(Sort.Direction.DESC, "timestamp"); // Sortierung nach timestamp (absteigend)
+        nonLatestPageable = PageRequest.of(nonLatestPageable.getPageNumber(), nonLatestPageable.getPageSize(), sort);
+
+        return documentVersionRepository.findByDocumentNameAndIsLatestFalse(nonLatestPageable, documentName);
+    }
+
 
     public DocumentVersionResponseDTO getDocumentVersion(Long id) {
         DocumentVersion documentVersion = documentVersionRepository.findById(id)
@@ -103,8 +121,28 @@ public class DocumentVersionService {
                 .collect(Collectors.toSet());
 
         String documentName = documentVersion.getDocument().getName();
-
+        DocumentOldVersionResponseDTO[] emptyIntArray = new DocumentOldVersionResponseDTO[0];
         return DocumentVersionResponseDTO.builder()
+                .id(documentVersion.getId())
+                .documentName(documentName)
+                .filepath(documentVersion.getFilepath())
+                .timestamp(documentVersion.getTimestamp())
+                .categoryNames(categoryNames)
+                .isRead(documentVersion.getIsRead())
+                .isLatest(documentVersion.getIsLatest())
+                .isVisible(documentVersion.getIsVisible())
+                .oldVersions(emptyIntArray)
+                .build();
+    }
+
+    public DocumentOldVersionResponseDTO convertToOldResponseDTO(DocumentVersion documentVersion) {
+        Set<String> categoryNames = documentVersion.getCategories().stream()
+                .map(Category::getName)
+                .collect(Collectors.toSet());
+
+        String documentName = documentVersion.getDocument().getName();
+        DocumentOldVersionResponseDTO[] emptyIntArray = new DocumentOldVersionResponseDTO[0];
+        return DocumentOldVersionResponseDTO.builder()
                 .id(documentVersion.getId())
                 .documentName(documentName)
                 .filepath(documentVersion.getFilepath())
@@ -115,6 +153,7 @@ public class DocumentVersionService {
                 .isVisible(documentVersion.getIsVisible())
                 .build();
     }
+
 }
 
 

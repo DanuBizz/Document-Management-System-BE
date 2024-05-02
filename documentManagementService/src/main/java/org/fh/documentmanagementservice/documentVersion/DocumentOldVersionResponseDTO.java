@@ -12,8 +12,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DocumentVersionResponseDTO {
-
+public class DocumentOldVersionResponseDTO {
     private Long id;
     private String documentName;
     private String filepath;
@@ -22,5 +21,4 @@ public class DocumentVersionResponseDTO {
     private Boolean isRead;
     private Boolean isLatest;
     private Boolean isVisible;
-    private DocumentOldVersionResponseDTO[] oldVersions;
 }
