@@ -18,6 +18,7 @@ public class DocumentVersionController {
         this.documentVersionService = documentVersionService;
     }
 
+
     @GetMapping
     public ResponseEntity<Page<DocumentVersionResponseDTO>> getAllDocumentVersions(Pageable pageable) {
         return ResponseEntity.ok(documentVersionService.getAllDocumentVersionsDTO(pageable));
