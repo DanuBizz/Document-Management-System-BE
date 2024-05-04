@@ -1,6 +1,5 @@
 package org.fh.documentmanagementservice.documentVersion;
 
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -13,7 +12,6 @@ import java.io.IOException;
 @RequestMapping("/documentVersions")
 public class DocumentVersionController {
 
-
     private final DocumentVersionService documentVersionService;
 
     public DocumentVersionController(DocumentVersionService documentVersionService) {
@@ -23,17 +21,18 @@ public class DocumentVersionController {
 
     @GetMapping
     public ResponseEntity<Page<DocumentVersionResponseDTO>> getAllDocumentVersions(Pageable pageable) {
-        Page<DocumentVersion> documentVersionPage = documentVersionService.getAllDocumentVersions(pageable);
-        Page<DocumentVersionResponseDTO> dtoPage = documentVersionPage.map(documentVersionService::convertToResponseDTO);
-        return ResponseEntity.ok(dtoPage);
+        return ResponseEntity.ok(documentVersionService.getAllDocumentVersionsDTO(pageable));
     }
 
+    @GetMapping("/latest-with-associated-versions")
+    public ResponseEntity<Page<DocumentVersionResponseDTO>> getLatestDocumentVersions(Pageable pageable) {
+        return ResponseEntity.ok(documentVersionService.getLatestWithAssociatedVersionsDTO(pageable));
+    }
 
     @PostMapping
     public ResponseEntity<DocumentVersionResponseDTO> uploadDocumentVersion(@ModelAttribute DocumentVersionRequestDTO requestDTO) {
         try {
-            DocumentVersionResponseDTO responseDTO = documentVersionService.createDocumentVersion(requestDTO);
-            return ResponseEntity.ok(responseDTO);
+            return ResponseEntity.ok(documentVersionService.createDocumentVersion(requestDTO));
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         } catch (IllegalArgumentException e) {
@@ -43,7 +42,11 @@ public class DocumentVersionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DocumentVersionResponseDTO> getDocumentVersion(@PathVariable Long id) {
-        DocumentVersionResponseDTO responseDTO = documentVersionService.getDocumentVersion(id);
-        return ResponseEntity.ok(responseDTO);
+        return ResponseEntity.ok(documentVersionService.getDocumentVersion(id));
+    }
+
+    @PutMapping("/{id}/toggle-visibility")
+    public ResponseEntity<DocumentVersionResponseDTO> toggleDocumentVersionVisibility(@PathVariable Long id) {
+        return ResponseEntity.ok(documentVersionService.toggleVisibility(id));
     }
 }
