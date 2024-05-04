@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 public class DocumentVersionService {
 
-    private static final String FILE_DIRECTORY = "C:\\Users\\mike\\KBB-test";
+    private static final String FILE_DIRECTORY = "C:\\Users\\Hasnat\\Downloads\\KBB-test\\";
 
     @Autowired
     private DocumentVersionRepository documentVersionRepository;
