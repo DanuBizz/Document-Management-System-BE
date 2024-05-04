@@ -1,8 +1,6 @@
-# Docker Compose file for setting up a MariaDB service.
 version: '3.1'
 
 services:
-
   mariadb:
     image: mariadb:10.5
     restart: always
@@ -13,6 +11,7 @@ services:
       MYSQL_PASSWORD: documentDB-pw
     volumes:
       - ./data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 3306:3306
 
