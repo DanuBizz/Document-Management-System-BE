@@ -80,7 +80,11 @@ public class DocumentVersionService {
 
     public DocumentVersionResponseDTO createDocumentVersion(DocumentVersionRequestDTO dto) throws IOException {
         Document document = documentRepository.findByName(dto.getName())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid document ID"));
+                .orElseGet(() -> {
+                    Document newDocument = new Document();
+                    newDocument.setName(dto.getName());
+                    return documentRepository.save(newDocument);
+                });
 
         String storedFilePath = storeFile(dto.getFile());
 

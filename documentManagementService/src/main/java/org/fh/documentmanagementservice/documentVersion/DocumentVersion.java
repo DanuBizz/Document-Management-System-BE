@@ -16,7 +16,7 @@ import java.util.Set;
  * It includes the necessary information to represent a DocVersion in the database.
  */
 @Entity
-@Table(name = "doc_versions")
+@Table(name = "document_versions")
 @Data
 @Builder
 @NoArgsConstructor
@@ -30,7 +30,7 @@ public class DocumentVersion {
     @JoinColumn(name = "document_id", nullable = false)
     private Document document;
 
-    @Column(nullable = false)
+    @Column(name= "file_path", nullable = false)
     private String filepath;
 
     @Column(nullable = false)
