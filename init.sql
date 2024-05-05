@@ -93,4 +93,3 @@ INSERT INTO user_category (category_id, user_id) VALUES
                                                      (3, 5),
                                                      (4, 6),
                                                      (5, 7);
-
