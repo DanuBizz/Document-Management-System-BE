@@ -1,6 +1,7 @@
 spring:
   application:
     name: DocumentManagementService
+    file-directory: "C:\\Users\\Hasnat\\Downloads\\KBB-test\\"
   datasource:
     url: jdbc:mariadb://localhost:3306/documentDB
     username: KBB-dev
@@ -9,7 +10,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true

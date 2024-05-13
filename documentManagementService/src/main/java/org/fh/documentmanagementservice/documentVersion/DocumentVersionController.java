@@ -8,9 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/documentVersions")
@@ -21,7 +18,6 @@ public class DocumentVersionController {
     public DocumentVersionController(DocumentVersionService documentVersionService) {
         this.documentVersionService = documentVersionService;
     }
-
 
     @GetMapping
     public ResponseEntity<Page<DocumentVersionResponseDTO>> getAllDocumentVersions(Pageable pageable) {

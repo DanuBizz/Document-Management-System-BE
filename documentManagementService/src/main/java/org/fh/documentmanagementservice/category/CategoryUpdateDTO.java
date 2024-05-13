@@ -4,13 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryResponseDTO {
-    private Long id;
+public class CategoryUpdateDTO {
     private String name;
-    private Map<Long, String> users; // Changed from userNames to users
+    private Set<Long> userIds;
 }

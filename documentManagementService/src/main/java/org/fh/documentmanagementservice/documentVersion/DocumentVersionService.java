@@ -7,6 +7,7 @@ import org.fh.documentmanagementservice.document.Document;
 import org.fh.documentmanagementservice.document.DocumentRepository;
 import org.fh.documentmanagementservice.document.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,12 +24,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
 public class DocumentVersionService {
 
-    private static final String FILE_DIRECTORY = "C:\\Users\\Hasnat\\Downloads\\KBB-test\\";
+    @Value("${spring.application.file-directory}")
+    private String fileDirectory;
 
     @Autowired
     private DocumentVersionRepository documentVersionRepository;
@@ -41,37 +45,19 @@ public class DocumentVersionService {
     @Autowired
     private DocumentService documentService;
 
-    public Page<DocumentVersionResponseDTO> getAllDocumentVersionsDTO(Pageable pageable) {
-        return getAllDocumentVersions(pageable).map(this::convertToResponseDTO);
-    }
+    private static final Logger logger = Logger.getLogger(DocumentVersionService.class.getName());
 
-    public Page<DocumentVersion> getAllDocumentVersions(Pageable pageable) {
-        return documentVersionRepository.findAll(pageable);
+    public Page<DocumentVersionResponseDTO> getAllDocumentVersionsDTO(Pageable pageable) {
+        return documentVersionRepository.findAll(pageable).map(this::convertToResponseDTO);
     }
 
     public Page<DocumentVersionResponseDTO> getLatestWithAssociatedVersionsDTO(Pageable pageable) {
-        Page<DocumentVersion> documentVersionPage = getLatestDocumentVersions(pageable);
-        Page<DocumentVersionResponseDTO> dtoPage = documentVersionPage.map(this::convertToResponseDTO);
-
-        dtoPage.forEach(dto -> {
-            List<DocumentOldVersionResponseDTO> oldVersionDTOList = getNonLatestDocumentVersionsDTO(dto.getDocumentName());
-            dto.setOldVersions(oldVersionDTOList.toArray(new DocumentOldVersionResponseDTO[0]));
-        });
-
-        return dtoPage;
-    }
-
-    public Page<DocumentVersion> getLatestDocumentVersions(Pageable pageable) {
-        return documentVersionRepository.findByIsLatestTrue(pageable);
-    }
-
-    public List<DocumentOldVersionResponseDTO> getNonLatestDocumentVersionsDTO(String documentName) {
-        return getNonLatestDocumentVersions(documentName).map(this::convertToOldResponseDTO).getContent();
-    }
-
-    public Page<DocumentVersion> getNonLatestDocumentVersions(String documentName) {
-        Pageable nonLatestPageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "timestamp"));
-        return documentVersionRepository.findByDocumentNameAndIsLatestFalse(nonLatestPageable, documentName);
+        return documentVersionRepository.findByIsLatestTrue(pageable)
+                .map(this::convertToResponseDTO)
+                .map(dto -> {
+                    dto.setOldVersions(getNonLatestDocumentVersionsDTO(dto.getDocumentName()).toArray(new DocumentOldVersionResponseDTO[0]));
+                    return dto;
+                });
     }
 
     public DocumentVersionResponseDTO getDocumentVersion(Long id) {
@@ -88,7 +74,9 @@ public class DocumentVersionService {
                     return documentRepository.save(newDocument);
                 });
 
-        String storedFilePath = storeFile(dto.getFile());
+        updateLatestVersionFlag(document);
+
+        String storedFilePath = storeFile(dto.getFile(), dto.getName());
 
         DocumentVersion documentVersion = DocumentVersion.builder()
                 .document(document)
@@ -100,21 +88,34 @@ public class DocumentVersionService {
                 .isVisible(true)
                 .build();
 
-        updateLatestVersionFlag(document);
+        document.getVersions().add(documentVersion);
 
-        return convertToResponseDTO(documentVersionRepository.save(documentVersion));
+        try {
+            DocumentVersion savedDocumentVersion = documentVersionRepository.save(documentVersion);
+            return convertToResponseDTO(savedDocumentVersion);
+        } catch (Exception e) {
+            // Log the exception to understand what went wrong
+            logger.info("Error saving DocumentVersion: ");
+            throw e; // Re-throw the exception to be handled by the controller
+        }
     }
 
-    public String storeFile(MultipartFile file) throws IOException {
-        if (!file.isEmpty()) {
-            String originalFilename = file.getOriginalFilename();
-            String storedFilename = UUID.randomUUID() + "-" + originalFilename;
-            Path destinationFilePath = Paths.get(FILE_DIRECTORY + storedFilename);
-            file.transferTo(destinationFilePath);
-            return destinationFilePath.toString();
-        } else {
+    public String storeFile(MultipartFile file, String documentName) throws IOException {
+        if (file.isEmpty()) {
             throw new IllegalArgumentException("File is empty and cannot be saved.");
         }
+
+        String documentPath = fileDirectory + documentName;
+        File directory = new File(documentPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String storedFilename = UUID.randomUUID() + "-" + originalFilename;
+        Path destinationFilePath = Paths.get(documentPath, storedFilename);
+        file.transferTo(destinationFilePath);
+        return destinationFilePath.toString();
     }
 
     public Set<Category> collectCategories(Set<Long> categoryIds) {
@@ -125,13 +126,40 @@ public class DocumentVersionService {
     }
 
     public void updateLatestVersionFlag(Document document) {
-        document.getVersions().forEach(v -> {
-            v.setIsLatest(false);
-            documentVersionRepository.save(v);
-        });
+        List<DocumentVersion> latestVersions = documentVersionRepository.findByDocumentIdAndIsLatestTrue(document.getId());
+        for (DocumentVersion version : latestVersions) {
+            version.setIsLatest(false);
+            documentVersionRepository.save(version);
+        }
     }
 
-    public DocumentVersionResponseDTO convertToResponseDTO(DocumentVersion documentVersion) {
+    public DocumentVersionResponseDTO toggleVisibility(Long id) {
+        DocumentVersion documentVersion = documentVersionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid document version ID"));
+        documentVersion.setIsVisible(!documentVersion.getIsVisible());
+        return convertToResponseDTO(documentVersionRepository.save(documentVersion));
+    }
+
+    public void writeFileToResponse(Long id, HttpServletResponse response) {
+        DocumentVersionResponseDTO documentVersion = getDocumentVersion(id);
+        Path filePath = Paths.get(documentVersion.getFilepath());
+
+        if (Files.notExists(filePath)) {
+            throw new RuntimeException("File not found with filename: " + documentVersion.getFilepath());
+        }
+
+        response.setContentType("application/octet-stream");
+        response.addHeader("Content-Disposition", "attachment; filename=" + filePath.getFileName().toString());
+
+        try {
+            Files.copy(filePath, response.getOutputStream());
+            response.getOutputStream().flush();
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing file to output stream.");
+        }
+    }
+
+    private DocumentVersionResponseDTO convertToResponseDTO(DocumentVersion documentVersion) {
         Set<String> categoryNames = documentVersion.getCategories().stream()
                 .map(Category::getName)
                 .collect(Collectors.toSet());
@@ -149,7 +177,7 @@ public class DocumentVersionService {
                 .build();
     }
 
-    public DocumentOldVersionResponseDTO convertToOldResponseDTO(DocumentVersion documentVersion) {
+    private DocumentOldVersionResponseDTO convertToOldResponseDTO(DocumentVersion documentVersion) {
         Set<String> categoryNames = documentVersion.getCategories().stream()
                 .map(Category::getName)
                 .collect(Collectors.toSet());
@@ -166,29 +194,10 @@ public class DocumentVersionService {
                 .build();
     }
 
-    public DocumentVersionResponseDTO toggleVisibility(Long id) {
-        DocumentVersion documentVersion = documentVersionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid document version ID"));
-        documentVersion.setIsVisible(!documentVersion.getIsVisible());
-        return convertToResponseDTO(documentVersionRepository.save(documentVersion));
-    }
-
-    public void writeFileToResponse(Long id, HttpServletResponse response) {
-        DocumentVersionResponseDTO documentVersion = getDocumentVersion(id);
-        Path filePath = Paths.get(documentVersion.getFilepath());
-
-        if (Files.exists(filePath)) {
-            response.setContentType("application/octet-stream");
-            response.addHeader("Content-Disposition", "attachment; filename=" + filePath.getFileName().toString());
-
-            try {
-                Files.copy(filePath, response.getOutputStream());
-                response.getOutputStream().flush();
-            } catch (IOException e) {
-                throw new RuntimeException("Error writing file to output stream.");
-            }
-        } else {
-            throw new RuntimeException("File not found with filename: " + documentVersion.getFilepath());
-        }
+    private List<DocumentOldVersionResponseDTO> getNonLatestDocumentVersionsDTO(String documentName) {
+        return documentVersionRepository.findByDocumentNameAndIsLatestFalse(PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "timestamp")), documentName)
+                .stream()
+                .map(this::convertToOldResponseDTO)
+                .collect(Collectors.toList());
     }
 }

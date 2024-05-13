@@ -9,10 +9,7 @@ import org.springframework.stereotype.Service;
 import org.fh.documentmanagementservice.exception.ResourceNotFoundException;
 
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Service for Category related operations.
@@ -41,19 +38,17 @@ public class CategoryService {
     public Category createCategory(CategoryRequestDTO categoryRequestDTO) {
         Category category = new Category();
         category.setName(categoryRequestDTO.getName());
-        List<User> userList = userRepository.findAllById(categoryRequestDTO.getUserIds());
-        Set<User> users = new HashSet<>(userList);
+        Set<User> users = new HashSet<>(userRepository.findAllById(categoryRequestDTO.getUserIds()));
         category.setUsers(users);
         return categoryRepository.save(category);
     }
 
-    public Category updateCategory(Long id, CategoryRequestDTO categoryRequestDTO) {
+    public Category updateCategory(Long id, CategoryUpdateDTO categoryUpdateDTO) {
         Category category = getCategoryById(id)
                 .orElseThrow(ResourceNotFoundException::new);
-        category.setName(categoryRequestDTO.getName());
+        category.setName(categoryUpdateDTO.getName());
         category.getUsers().clear();
-        List<User> userList = userRepository.findAllById(categoryRequestDTO.getUserIds());
-        Set<User> users = new HashSet<>(userList);
+        Set<User> users = new HashSet<>(userRepository.findAllById(categoryUpdateDTO.getUserIds()));
         category.setUsers(users);
         return categoryRepository.save(category);
     }
