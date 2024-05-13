@@ -77,4 +77,19 @@ public class UserService {
 
         return userResponseDTO;
     }
+
+    public UserResponseDTO toggleUserAdminStatus(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setIsAdmin(!user.getIsAdmin());
+
+            User updatedUser = userRepository.save(user);
+
+            return convertToUserResponseDTO(updatedUser);
+        } else {
+            throw new RuntimeException("User not found with id: " + id);
+        }
+    }
 }

@@ -52,4 +52,10 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}/toggle-admin")
+    public ResponseEntity<UserResponseDTO> toggleUserAdminStatus(@PathVariable Long id) {
+        UserResponseDTO userResponseDTO = userService.toggleUserAdminStatus(id);
+        return ResponseEntity.ok(userResponseDTO);
+    }
 }

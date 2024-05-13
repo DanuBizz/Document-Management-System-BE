@@ -51,6 +51,7 @@ public class CategoryService {
         Category category = getCategoryById(id)
                 .orElseThrow(ResourceNotFoundException::new);
         category.setName(categoryRequestDTO.getName());
+        category.getUsers().clear();
         List<User> userList = userRepository.findAllById(categoryRequestDTO.getUserIds());
         Set<User> users = new HashSet<>(userList);
         category.setUsers(users);

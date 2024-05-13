@@ -1,5 +1,6 @@
 package org.fh.documentmanagementservice.documentVersion;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.fh.documentmanagementservice.category.Category;
 import org.fh.documentmanagementservice.category.CategoryRepository;
 import org.fh.documentmanagementservice.document.Document;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 public class DocumentVersionService {
 
-    private static final String FILE_DIRECTORY = "C:\\Users\\mike\\KBB-test";
+    private static final String FILE_DIRECTORY = "C:\\Users\\Hasnat\\Downloads\\KBB-test\\";
 
     @Autowired
     private DocumentVersionRepository documentVersionRepository;
@@ -169,5 +171,24 @@ public class DocumentVersionService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid document version ID"));
         documentVersion.setIsVisible(!documentVersion.getIsVisible());
         return convertToResponseDTO(documentVersionRepository.save(documentVersion));
+    }
+
+    public void writeFileToResponse(Long id, HttpServletResponse response) {
+        DocumentVersionResponseDTO documentVersion = getDocumentVersion(id);
+        Path filePath = Paths.get(documentVersion.getFilepath());
+
+        if (Files.exists(filePath)) {
+            response.setContentType("application/octet-stream");
+            response.addHeader("Content-Disposition", "attachment; filename=" + filePath.getFileName().toString());
+
+            try {
+                Files.copy(filePath, response.getOutputStream());
+                response.getOutputStream().flush();
+            } catch (IOException e) {
+                throw new RuntimeException("Error writing file to output stream.");
+            }
+        } else {
+            throw new RuntimeException("File not found with filename: " + documentVersion.getFilepath());
+        }
     }
 }

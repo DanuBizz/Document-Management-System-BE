@@ -1,5 +1,6 @@
 package org.fh.documentmanagementservice.documentVersion;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/documentVersions")
@@ -48,5 +52,10 @@ public class DocumentVersionController {
     @PutMapping("/{id}/toggle-visibility")
     public ResponseEntity<DocumentVersionResponseDTO> toggleDocumentVersionVisibility(@PathVariable Long id) {
         return ResponseEntity.ok(documentVersionService.toggleVisibility(id));
+    }
+
+    @GetMapping("/{id}/file")
+    public void getFile(@PathVariable Long id, HttpServletResponse response) {
+        documentVersionService.writeFileToResponse(id, response);
     }
 }
