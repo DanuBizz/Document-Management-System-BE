@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.fh.documentmanagementservice.user.User;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -30,11 +31,11 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<Page<CategoryResponseDTO>> getAllCategories(Pageable pageable) {
         Page<Category> categoryPage = categoryService.getAllCategories(pageable);
-        Page<CategoryResponseDTO> dtoPage = categoryPage.map(category -> new CategoryResponseDTO(
-                category.getId(),
-                category.getName(),
-                category.getUsers().stream().collect(Collectors.toMap(User::getId, User::getUsername))
-        ));
+        Page<CategoryResponseDTO> dtoPage = categoryPage.map(category -> {
+            List<Long> userIds = category.getUsers().stream().map(User::getId).collect(Collectors.toList());
+            List<String> userNames = category.getUsers().stream().map(User::getUsername).collect(Collectors.toList());
+            return new CategoryResponseDTO(category.getId(), category.getName(), userIds, userNames);
+        });
         return ResponseEntity.ok(dtoPage);
     }
 
@@ -42,30 +43,30 @@ public class CategoryController {
     public ResponseEntity<CategoryResponseDTO> getCategoryById(@PathVariable Long id) {
         Category category = categoryService.getCategoryById(id)
                 .orElseThrow(ResourceNotFoundException::new);
-        Map<Long, String> users = category.getUsers().stream()
-                .collect(Collectors.toMap(User::getId, User::getUsername));
+        List<Long> userIds = category.getUsers().stream().map(User::getId).collect(Collectors.toList());
+        List<String> userNames = category.getUsers().stream().map(User::getUsername).collect(Collectors.toList());
         CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(
-                category.getId(), category.getName(), users);
+                category.getId(), category.getName(), userIds, userNames);
         return new ResponseEntity<>(categoryResponseDTO, HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> createCategory(@RequestBody CategoryRequestDTO categoryRequestDTO) {
         Category category = categoryService.createCategory(categoryRequestDTO);
-        Map<Long, String> users = category.getUsers().stream()
-                .collect(Collectors.toMap(User::getId, User::getUsername));
+        List<Long> userIds = category.getUsers().stream().map(User::getId).collect(Collectors.toList());
+        List<String> userNames = category.getUsers().stream().map(User::getUsername).collect(Collectors.toList());
         CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(
-                category.getId(), category.getName(), users);
+                category.getId(), category.getName(), userIds, userNames);
         return new ResponseEntity<>(categoryResponseDTO, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryUpdateDTO categoryUpdateDTO) {
         Category updatedCategory = categoryService.updateCategory(id, categoryUpdateDTO);
-        Map<Long, String> users = updatedCategory.getUsers().stream()
-                .collect(Collectors.toMap(User::getId, User::getUsername));
+        List<Long> userIds = updatedCategory.getUsers().stream().map(User::getId).collect(Collectors.toList());
+        List<String> userNames = updatedCategory.getUsers().stream().map(User::getUsername).collect(Collectors.toList());
         CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(
-                updatedCategory.getId(), updatedCategory.getName(), users);
+                updatedCategory.getId(), updatedCategory.getName(), userIds, userNames);
         return new ResponseEntity<>(categoryResponseDTO, HttpStatus.OK);
     }
 
