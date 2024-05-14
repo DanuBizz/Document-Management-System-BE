@@ -46,7 +46,6 @@ public class CategoryService {
     public Category updateCategory(Long id, CategoryUpdateDTO categoryUpdateDTO) {
         Category category = getCategoryById(id)
                 .orElseThrow(ResourceNotFoundException::new);
-        category.setName(categoryUpdateDTO.getName());
         category.getUsers().clear();
         Set<User> users = new HashSet<>(userRepository.findAllById(categoryUpdateDTO.getUserIds()));
         category.setUsers(users);

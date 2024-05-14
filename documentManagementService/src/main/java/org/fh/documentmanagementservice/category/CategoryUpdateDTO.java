@@ -10,6 +10,5 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryUpdateDTO {
-    private String name;
     private Set<Long> userIds;
 }
