@@ -8,10 +8,15 @@ import org.fh.documentmanagementservice.document.DocumentRepository;
 import org.fh.documentmanagementservice.document.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,8 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -199,5 +204,16 @@ public class DocumentVersionService {
                 .stream()
                 .map(this::convertToOldResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Resource getFileAsResource(Long id) {
+        DocumentVersionResponseDTO documentVersion = getDocumentVersion(id);
+        Path filePath = Paths.get(documentVersion.getFilepath());
+
+        if (Files.notExists(filePath)) {
+            throw new RuntimeException("File not found with filename: " + documentVersion.getFilepath());
+        }
+
+        return new FileSystemResource(filePath.toFile());
     }
 }
