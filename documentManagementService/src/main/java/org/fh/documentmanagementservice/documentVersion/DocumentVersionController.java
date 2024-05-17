@@ -59,7 +59,7 @@ public class DocumentVersionController {
         Resource file = documentVersionService.getFileAsResource(id);
         if (file.exists()) {
             return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentType(MediaType.APPLICATION_PDF)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                     .body(file);
         } else {
