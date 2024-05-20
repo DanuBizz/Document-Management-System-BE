@@ -1,4 +1,4 @@
-package org.fh.usermanagementwebservice.dto;
+package org.fh.documentmanagementservice.user;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,15 +16,15 @@ public class UserNameDTO implements Comparable<UserNameDTO> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String name;
 
     public UserNameDTO() {
     }
 
-    public UserNameDTO(Integer id, String firstName, String lastName) {
+    public UserNameDTO(Long id, String name) {
         this.id = id;
-        this.name = firstName + " " + lastName;
+        this.name = name;
     }
 
     @Override

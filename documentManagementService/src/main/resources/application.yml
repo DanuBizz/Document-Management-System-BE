@@ -9,7 +9,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -21,10 +21,38 @@ spring:
     api-docs:
       path: /api-docs
 
+server:
+  port: 8080
+# discovery client
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://127.0.0.1:8081/eureka/
+user:
+  control:
+    url: http://localhost:8080
+# variables
+active:
+  directory:
+    url: ldap://localhost:10389
+    domain: example.com
+    search:
+      base: OU=USERS,OU=SYSTEM,DC=EXAMPLE,DC=COM
+      filter: (objectClass=person)
+    binding:
+      user: uid=admin,ou=system
 
-
+  # variables
+  # ATTENTION: If you want to start the services from your root folder instead, like e.g. IntelliJ does by default,
+  # don't forget to add the following prefix is required in front of the current path: userManagementWebservice/
+  # Example: userManagementWebservice/src/main/resources/ instead of src/main/resources/
+path:
+  to:
+    active-directory-binding-pwd: documentManagementService/src/main/resources/active-directory-binding-pwd.csv
 logging:
   level:
+    root: DEBUG
+    org.springframework: DEBUG
     org.springframework.data.rest: DEBUG
     org.springframework.web.servlet.mvc.method.annotation: DEBUG
     # org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG

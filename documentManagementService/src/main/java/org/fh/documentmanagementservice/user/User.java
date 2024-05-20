@@ -17,7 +17,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements Comparable<User>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,4 +30,15 @@ public class User {
 
     @Column(nullable = false)
     private Boolean isAdmin;
+
+    public User(String username, String email, Boolean isAdmin) {
+        this.username = username;
+        this.email = email;
+        this.isAdmin = isAdmin;
+    }
+
+    @Override
+    public int compareTo(User o) {
+            return this.getUsername().compareToIgnoreCase(o.getUsername());
+        }
 }

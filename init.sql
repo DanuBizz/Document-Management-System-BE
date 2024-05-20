@@ -66,6 +66,7 @@ INSERT INTO users (username, email, is_admin) VALUES
                                                   ('bob_brown', 'bob.brown@example.com', TRUE),
                                                   ('charlie_clark', 'charlie.clark@example.com', FALSE),
                                                   ('emily_evans', 'emily.evans@example.com', FALSE),
+                                                  ('admin', 'admin@example.com', TRUE),
                                                   ('david_wilson', 'david.wilson@example.com', FALSE);
 
 -- Insert test data for documents
