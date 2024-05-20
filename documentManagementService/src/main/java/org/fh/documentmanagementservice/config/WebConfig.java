@@ -10,6 +10,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -52,7 +54,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authorizationInterceptor);
+        registry.addInterceptor(authorizationInterceptor)
+                .excludePathPatterns("/usercontrol/**");
     }
 
     /**
@@ -100,11 +103,21 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         if (isProduction()) {
-            ActiveDirectoryLdapAuthenticationProvider adProvider =
+            /*ActiveDirectoryLdapAuthenticationProvider adProvider =
                     new ActiveDirectoryLdapAuthenticationProvider(adDomain, adUrl);
             adProvider.setConvertSubErrorCodesToExceptions(true);
             adProvider.setUseAuthenticationRequestCredentials(true);
-            auth.authenticationProvider(adProvider);
+            auth.authenticationProvider(adProvider);*/
+            auth
+                    .ldapAuthentication()
+                    .userDnPatterns("uid={0},ou=people")
+                    .groupSearchBase("ou=groups")
+                    .contextSource()
+                    .url("ldap://localhost:8389/dc=springframework,dc=org")
+                    .and()
+                    .passwordCompare()
+                    .passwordEncoder(NoOpPasswordEncoder.getInstance())
+                    .passwordAttribute("userPassword");
         } else {
             auth
                     .inMemoryAuthentication()

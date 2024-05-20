@@ -13,7 +13,6 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
 import java.io.BufferedReader;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -204,25 +203,25 @@ public class UserService {
 
     private DirContext getActiveDirectoryContext() throws Exception {
         String username = activeDirectoryBindingUser;
-        String password = readActiveDirectoryBindingPassword();
+        //String password = readActiveDirectoryBindingPassword();
 
         Hashtable<String, String> env = new Hashtable<>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, activeDirectoryUrl);
+        env.put(Context.PROVIDER_URL, "ldap://localhost:8389/dc=springframework,dc=org");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        env.put(Context.SECURITY_PRINCIPAL, username);
-        env.put(Context.SECURITY_CREDENTIALS, password);
+        //env.put(Context.SECURITY_PRINCIPAL, username);
+        //env.put(Context.SECURITY_CREDENTIALS, password);
 
         return new InitialDirContext(env);
     }
 
-    private String readActiveDirectoryBindingPassword() throws Exception {
+    /*private String readActiveDirectoryBindingPassword() throws Exception {
         BufferedReader br = new BufferedReader(new java.io.FileReader(pathToActiveDirectoryBindingPwdCsv));
         String password = br.readLine();
         System.out.println("Password: " + password);
         br.close();
         return password;
-    }
+    }*/
 
     private NamingEnumeration<SearchResult> getActiveDirectorySearchResult(DirContext context) throws NamingException {
         String searchBase = activeDirectorySearchBase;

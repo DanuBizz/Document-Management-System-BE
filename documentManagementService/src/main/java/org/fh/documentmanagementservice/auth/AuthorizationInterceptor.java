@@ -31,6 +31,9 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         headers.add("Authorization", request.getHeader("Authorization"));
         try {
             ResponseEntity<String> userControlResponse = restTemplate.exchange(userControlUrl, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+            // Debugging: Print the response status
+            System.out.println("User Control Response Status: " + userControlResponse.getStatusCode());
+
             if (userControlResponse.getStatusCode().is2xxSuccessful()) {
                 return true;
             } else {

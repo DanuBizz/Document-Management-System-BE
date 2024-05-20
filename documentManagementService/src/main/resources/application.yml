@@ -20,7 +20,13 @@ spring:
       path: /swagger-ui.html
     api-docs:
       path: /api-docs
-
+  profiles:
+    active: prod
+  ldap:
+    embedded:
+      port: 8389
+      base-dn: dc=springframework,dc=org
+      ldif: classpath:test-server.ldif
 server:
   port: 8080
 # discovery client
@@ -30,14 +36,14 @@ server:
 #      defaultZone: http://127.0.0.1:8081/eureka/
 user:
   control:
-    url: http://localhost:8080
+    url: http://localhost:8080/usercontrol
 # variables
 active:
   directory:
     url: ldap://localhost:10389
     domain: example.com
     search:
-      base: OU=USERS,OU=SYSTEM,DC=EXAMPLE,DC=COM
+      base: ou=people,dc=springframework,dc=org
       filter: (objectClass=person)
     binding:
       user: uid=admin,ou=system
