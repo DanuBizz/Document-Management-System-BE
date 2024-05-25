@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -13,6 +12,6 @@ import java.util.Map;
 public class CategoryResponseDTO {
     private Long id;
     private String name;
-    private List<Long> userIds;
-    private List<String> userNames;
+    private List<Long> groupIds;
+    private List<String> groupNames;
 }

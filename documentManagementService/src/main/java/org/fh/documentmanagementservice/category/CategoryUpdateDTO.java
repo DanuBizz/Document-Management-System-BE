@@ -10,5 +10,5 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryUpdateDTO {
-    private Set<Long> userIds;
+    private Set<Long> groupIds;
 }

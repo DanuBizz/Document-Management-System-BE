@@ -58,4 +58,10 @@ public class UserController {
         UserResponseDTO userResponseDTO = userService.toggleUserAdminStatus(id);
         return ResponseEntity.ok(userResponseDTO);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<UserResponseDTO>> searchUsers(@RequestParam String search, Pageable pageable) {
+        Page<UserResponseDTO> userPage = userService.searchUsers(search, pageable);
+        return ResponseEntity.ok(userPage);
+    }
 }

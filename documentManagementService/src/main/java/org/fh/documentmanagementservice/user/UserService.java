@@ -2,10 +2,13 @@ package org.fh.documentmanagementservice.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -91,5 +94,20 @@ public class UserService {
         } else {
             throw new RuntimeException("User not found with id: " + id);
         }
+    }
+
+    public Page<UserResponseDTO> searchUsers(String search, Pageable pageable) {
+        List<User> allUsers = userRepository.findAll();
+        List<User> filteredUsers = allUsers.stream()
+                .filter(user -> user.getUsername().toLowerCase().startsWith(search.toLowerCase()))
+                .collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filteredUsers.size());
+
+        List<User> usersPageList = filteredUsers.subList(start, end);
+        Page<User> usersPage = new PageImpl<>(usersPageList, pageable, filteredUsers.size());
+
+        return usersPage.map(this::convertToUserResponseDTO);
     }
 }

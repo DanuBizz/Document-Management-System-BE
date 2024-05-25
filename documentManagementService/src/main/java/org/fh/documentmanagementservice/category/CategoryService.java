@@ -1,30 +1,27 @@
 package org.fh.documentmanagementservice.category;
 
-import org.fh.documentmanagementservice.user.User;
-import org.fh.documentmanagementservice.user.UserRepository;
+import org.fh.documentmanagementservice.group.Group;
+import org.fh.documentmanagementservice.group.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.fh.documentmanagementservice.exception.ResourceNotFoundException;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
-import java.util.*;
-
-/**
- * Service for Category related operations.
- * It handles the business logic for the Category entity.
- */
 @Service
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;  // Assuming there's a UserRepository handling User entities
+    private final GroupRepository groupRepository;
 
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository, UserRepository userRepository) {
+    public CategoryService(CategoryRepository categoryRepository, GroupRepository groupRepository) {
         this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository;
+        this.groupRepository = groupRepository;
     }
 
     public Page<Category> getAllCategories(Pageable pageable) {
@@ -38,17 +35,17 @@ public class CategoryService {
     public Category createCategory(CategoryRequestDTO categoryRequestDTO) {
         Category category = new Category();
         category.setName(categoryRequestDTO.getName());
-        Set<User> users = new HashSet<>(userRepository.findAllById(categoryRequestDTO.getUserIds()));
-        category.setUsers(users);
+        Set<Group> groups = new HashSet<>(groupRepository.findAllById(categoryRequestDTO.getGroupIds()));
+        category.setGroups(groups);
         return categoryRepository.save(category);
     }
 
     public Category updateCategory(Long id, CategoryUpdateDTO categoryUpdateDTO) {
         Category category = getCategoryById(id)
                 .orElseThrow(ResourceNotFoundException::new);
-        category.getUsers().clear();
-        Set<User> users = new HashSet<>(userRepository.findAllById(categoryUpdateDTO.getUserIds()));
-        category.setUsers(users);
+        category.getGroups().clear();
+        Set<Group> groups = new HashSet<>(groupRepository.findAllById(categoryUpdateDTO.getGroupIds()));
+        category.setGroups(groups);
         return categoryRepository.save(category);
     }
 

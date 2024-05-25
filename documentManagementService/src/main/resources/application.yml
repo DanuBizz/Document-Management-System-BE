@@ -10,19 +10,20 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
         use_sql_comments: true
         dialect: org.hibernate.dialect.MariaDBDialect
+  devtools:
+    restart:
+      enabled: true
   springdoc:
     swagger-ui:
       path: /swagger-ui.html
     api-docs:
       path: /api-docs
-
-
 
 logging:
   level:
