@@ -66,9 +66,14 @@ public class DocumentVersionService {
         return documentVersionRepository.findAll(pageable).map(this::convertToResponseDTO);
     }
 
-    public Page<DocumentVersionResponseDTO> getLatestWithAssociatedVersionsDTO(Pageable pageable) {
-        return documentVersionRepository.findByIsLatestTrue(pageable)
-                .map(this::convertToResponseDTO)
+    public Page<DocumentVersionResponseDTO> getLatestWithAssociatedVersionsDTO(String search, Pageable pageable) {
+        Page<DocumentVersion> documentVersions;
+        if (search.isEmpty()) {
+            documentVersions = documentVersionRepository.findByIsLatestTrue(pageable);
+        } else {
+            documentVersions = documentVersionRepository.findByDocumentNameStartingWithIgnoreCaseAndIsLatestTrue(search, pageable);
+        }
+        return documentVersions.map(this::convertToResponseDTO)
                 .map(dto -> {
                     dto.setOldVersions(getNonLatestDocumentVersionsDTO(dto.getDocumentName()).toArray(new DocumentOldVersionResponseDTO[0]));
                     return dto;
@@ -249,9 +254,5 @@ public class DocumentVersionService {
         }
 
         return new FileSystemResource(filePath.toFile());
-    }
-
-    public Page<DocumentVersion> searchDocumentVersions(String search, Pageable pageable) {
-        return documentVersionRepository.findByDocumentNameStartingWithIgnoreCase(search, pageable);
     }
 }

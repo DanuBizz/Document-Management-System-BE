@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Controller for User related operations.
  * It handles the HTTP requests and responses for the User entity.
@@ -63,5 +65,11 @@ public class UserController {
     public ResponseEntity<Page<UserResponseDTO>> searchUsers(@RequestParam String search, Pageable pageable) {
         Page<UserResponseDTO> userPage = userService.searchUsers(search, pageable);
         return ResponseEntity.ok(userPage);
+    }
+
+    @PutMapping("/{id}/groups")
+    public ResponseEntity<Void> updateUserGroups(@PathVariable Long id, @RequestBody List<String> groupNames) {
+        userService.updateUserGroups(id, groupNames);
+        return ResponseEntity.noContent().build();
     }
 }

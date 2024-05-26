@@ -1,5 +1,7 @@
 package org.fh.documentmanagementservice.user;
 
+import org.fh.documentmanagementservice.group.Group;
+import org.fh.documentmanagementservice.group.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,10 +16,12 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, GroupRepository groupRepository) {
         this.userRepository = userRepository;
+        this.groupRepository = groupRepository;
     }
 
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
@@ -99,5 +103,22 @@ public class UserService {
     public Page<UserResponseDTO> searchUsers(String search, Pageable pageable) {
         Page<User> userPage = userRepository.findByUsernameStartingWithIgnoreCase(search, pageable);
         return userPage.map(this::convertToUserResponseDTO);
+    }
+
+    public void updateUserGroups(Long userId, List<String> groupNames) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        for (String groupName : groupNames) {
+            Group group = groupRepository.findByName(groupName);
+
+            if (group == null) {
+                continue;
+            }
+
+            group.getUserIds().add(userId);
+            groupRepository.save(group);
+        }
     }
 }

@@ -29,8 +29,8 @@ public class DocumentVersionController {
     }
 
     @GetMapping("/latest-with-associated-versions")
-    public ResponseEntity<Page<DocumentVersionResponseDTO>> getLatestDocumentVersions(Pageable pageable) {
-        return ResponseEntity.ok(documentVersionService.getLatestWithAssociatedVersionsDTO(pageable));
+    public ResponseEntity<Page<DocumentVersionResponseDTO>> getLatestDocumentVersions(@RequestParam(defaultValue = "") String search, Pageable pageable) {
+        return ResponseEntity.ok(documentVersionService.getLatestWithAssociatedVersionsDTO(search, pageable));
     }
 
     @PostMapping
@@ -65,11 +65,5 @@ public class DocumentVersionController {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<Page<DocumentVersion>> searchDocumentVersions(@RequestParam String search, Pageable pageable) {
-        Page<DocumentVersion> documentVersionPage = documentVersionService.searchDocumentVersions(search, pageable);
-        return ResponseEntity.ok(documentVersionPage);
     }
 }
