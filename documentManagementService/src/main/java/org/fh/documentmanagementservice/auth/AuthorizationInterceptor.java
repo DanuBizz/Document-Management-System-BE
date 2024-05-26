@@ -19,7 +19,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 public class AuthorizationInterceptor implements HandlerInterceptor {
-
     @Value("${user.control.url}")
     private String userControlUrl;
 
@@ -32,9 +31,9 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         try {
             ResponseEntity<String> userControlResponse = restTemplate.exchange(userControlUrl, HttpMethod.GET, new HttpEntity<>(headers), String.class);
             // Debugging: Print the response status
-            System.out.println("User Control Response Status: " + userControlResponse.getStatusCode());
-
+            System.out.println(userControlResponse.getStatusCode());
             if (userControlResponse.getStatusCode().is2xxSuccessful()) {
+                response.setStatus(HttpServletResponse.SC_OK);
                 return true;
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

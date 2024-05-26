@@ -12,11 +12,25 @@ import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
-import java.io.BufferedReader;
 import java.util.*;
 
 @Service
 public class UserService {
+
+    @Value("${active.directory.url}")
+    private String activeDirectoryUrl;
+
+    @Value("${active.directory.search.base}")
+    private String activeDirectorySearchBase;
+
+    @Value("${active.directory.search.filter}")
+    private String activeDirectorySearchFilter;
+
+    @Value("${active.directory.binding.user}")
+    private String activeDirectoryBindingUser;
+
+    @Value("${path.to.active-directory-binding-pwd}")
+    private String pathToActiveDirectoryBindingPwdCsv;
 
     private final UserRepository userRepository;
 
@@ -48,16 +62,6 @@ public class UserService {
             return convertToUserResponseDTO(userOptional.get());
         } else {
             throw new RuntimeException("User not found with id: " + id);
-        }
-    }
-
-    public UserResponseDTO findUserByUsername(String username) {
-        Optional<User> userOptional = userRepository.findUserByUsername(username);
-
-        if (userOptional.isPresent()) {
-            return convertToUserResponseDTO(userOptional.get());
-        } else {
-            throw new RuntimeException("User not found with username: " + username);
         }
     }
 
@@ -96,24 +100,9 @@ public class UserService {
         return userResponseDTO;
     }
 
-    @Value("${active.directory.url}")
-    private String activeDirectoryUrl;
-
-    @Value("${active.directory.search.base}")
-    private String activeDirectorySearchBase;
-
-    @Value("${active.directory.search.filter}")
-    private String activeDirectorySearchFilter;
-
-    @Value("${active.directory.binding.user}")
-    private String activeDirectoryBindingUser;
-
-    @Value("${path.to.active-directory-binding-pwd}")
-    private String pathToActiveDirectoryBindingPwdCsv;
-
     // GET or create one user, if it doesn't exist already
     public User getUserData(String username) throws Exception {
-        User user = userRepository.findByUserLogonName(username);
+        User user = userRepository.findByUserUsername(username);
         if (user != null) {
             return userRepository.saveAndFlush(user);
         } else {
@@ -207,21 +196,13 @@ public class UserService {
 
         Hashtable<String, String> env = new Hashtable<>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, "ldap://localhost:8389/dc=springframework,dc=org");
+        env.put(Context.PROVIDER_URL, "ldap://localhost:8389/");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         //env.put(Context.SECURITY_PRINCIPAL, username);
         //env.put(Context.SECURITY_CREDENTIALS, password);
 
         return new InitialDirContext(env);
     }
-
-    /*private String readActiveDirectoryBindingPassword() throws Exception {
-        BufferedReader br = new BufferedReader(new java.io.FileReader(pathToActiveDirectoryBindingPwdCsv));
-        String password = br.readLine();
-        System.out.println("Password: " + password);
-        br.close();
-        return password;
-    }*/
 
     private NamingEnumeration<SearchResult> getActiveDirectorySearchResult(DirContext context) throws NamingException {
         String searchBase = activeDirectorySearchBase;
@@ -230,8 +211,8 @@ public class UserService {
         SearchControls controls = new SearchControls();
         controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         String[] attributesToRetrieve = {
-                "userPrincipalName",    // user logon name
-                "userAccountControl",   // if user is activated or deactivated
+                //"userPrincipalName",    // user logon name
+                //"userAccountControl",   // if user is activated or deactivated
                 "givenName",            // first name
                 "sn",                   // last name
                 "mail"                  // e-mail address
@@ -244,16 +225,20 @@ public class UserService {
     private User getUserDataFromActiveDirectorySearchResult(SearchResult searchResult) throws NamingException {
         Attributes attributes = searchResult.getAttributes();
 
-        Attribute userPrincipalNameAttr = attributes.get("userPrincipalName");
+        /*Attribute userPrincipalNameAttr = attributes.get("userPrincipalName");
         String userPrincipalName = (userPrincipalNameAttr != null) ? (String) userPrincipalNameAttr.get() : null;
         if (userPrincipalName != null) {
             userPrincipalName = userPrincipalName.split("@")[0];
-        }
+        }*/
+        Attribute firstNameAttr = attributes.get("givenName");
+        String firstName = (firstNameAttr != null) ? (String) firstNameAttr.get() : null;
 
+        Attribute lastNameAttr = attributes.get("sn");
+        String lastName = (lastNameAttr != null) ? (String) lastNameAttr.get() : null;
         Attribute emailAttr = attributes.get("mail");
         String email = (emailAttr != null) ? (String) emailAttr.get() : null;
 
-        return new User(userPrincipalName, email, false);
+        return new User(firstName, email, false);
     }
 
 }

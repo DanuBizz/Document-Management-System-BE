@@ -49,12 +49,6 @@ public class UserController {
         return ResponseEntity.ok(userResponseDTO);
     }
 
-    @GetMapping("/user/{username}")
-    public ResponseEntity<UserResponseDTO> getUserByUsername(@PathVariable String username) {
-        UserResponseDTO userResponseDTO = userService.findUserByUsername(username);
-        return ResponseEntity.ok(userResponseDTO);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserRequestDTO userRequestDTO) {
         UserResponseDTO userResponseDTO = userService.updateUser(id, userRequestDTO);
@@ -72,6 +66,7 @@ public class UserController {
     @GetMapping(path = "user/coded/{encodedUsername}")
     public User getUserData(@PathVariable String encodedUsername) throws Exception {
         byte[] decoded = Base64.decodeBase64(encodedUsername);
+        System.out.println(decoded);
         return userService.getUserData(new String(decoded, StandardCharsets.UTF_8));
     }
 

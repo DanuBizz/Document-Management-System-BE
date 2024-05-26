@@ -51,18 +51,95 @@ objectclass: organizationalPerson
 objectclass: inetOrgPerson
 cn: Bob Hamilton
 sn: Hamilton
+givenName: Bob
 uid: bob
 userPassword: bobspassword
+mail: bob.hamilton@example.com
 
-dn: uid=joe,ou=otherpeople,dc=springframework,dc=org
+dn: uid=alice,ou=people,dc=springframework,dc=org
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Alice Johnson
+sn: Johnson
+givenName: Alice
+uid: alice
+userPassword: alicespassword
+mail: alice.johnson@example.com
+
+dn: uid=charlie,ou=people,dc=springframework,dc=org
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Charlie Brown
+sn: Brown
+givenName: Charlie
+uid: charlie
+userPassword: charliespassword
+mail: charlie.brown@example.com
+
+dn: uid=david,ou=people,dc=springframework,dc=org
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: David Smith
+sn: Smith
+givenName: David
+uid: david
+userPassword: davidspassword
+mail: david.smith@example.com
+
+dn: uid=eve,ou=people,dc=springframework,dc=org
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Eve Adams
+sn: Adams
+givenName: Eve
+uid: eve
+userPassword: evespassword
+mail: eve.adams@example.com
+
+dn: uid=frank,ou=people,dc=springframework,dc=org
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Frank White
+sn: White
+givenName: Frank
+uid: frank
+userPassword: frankspassword
+mail: frank.white@example.com
+
+dn: uid=grace,ou=people,dc=springframework,dc=org
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Grace Hopper
+sn: Hopper
+givenName: Grace
+uid: grace
+userPassword: gracespassword
+mail: grace.hopper@example.com
+
+dn: uid=joe,ou=people,dc=springframework,dc=org
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
 objectclass: inetOrgPerson
 cn: Joe Smeth
 sn: Smeth
+givenName: Joe
 uid: joe
 userPassword: joespassword
+mail: joe.smeth@example.com
+
 
 dn: cn=mouse\, jerry,ou=people,dc=springframework,dc=org
 objectclass: top
