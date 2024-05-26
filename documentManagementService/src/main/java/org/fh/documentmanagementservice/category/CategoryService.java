@@ -55,4 +55,8 @@ public class CategoryService {
         }
         categoryRepository.deleteById(id);
     }
+
+    public Page<Category> searchCategories(String search, Pageable pageable) {
+        return categoryRepository.findByNameStartingWithIgnoreCase(search, pageable);
+    }
 }

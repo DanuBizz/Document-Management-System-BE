@@ -55,4 +55,8 @@ public class GroupService {
         }
         groupRepository.deleteById(id);
     }
+
+    public Page<Group> searchGroup(String name, Pageable pageable) {
+        return groupRepository.findByNameStartingWithIgnoreCase(name, pageable);
+    }
 }

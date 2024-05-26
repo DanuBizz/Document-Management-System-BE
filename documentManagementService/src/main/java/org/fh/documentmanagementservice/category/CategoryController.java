@@ -70,4 +70,10 @@ public class CategoryController {
         categoryService.deleteCategory(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Category>> searchCategories(@RequestParam String search, Pageable pageable) {
+        Page<Category> categoryPage = categoryService.searchCategories(search, pageable);
+        return ResponseEntity.ok(categoryPage);
+    }
 }

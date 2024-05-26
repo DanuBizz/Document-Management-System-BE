@@ -97,17 +97,7 @@ public class UserService {
     }
 
     public Page<UserResponseDTO> searchUsers(String search, Pageable pageable) {
-        List<User> allUsers = userRepository.findAll();
-        List<User> filteredUsers = allUsers.stream()
-                .filter(user -> user.getUsername().toLowerCase().startsWith(search.toLowerCase()))
-                .collect(Collectors.toList());
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), filteredUsers.size());
-
-        List<User> usersPageList = filteredUsers.subList(start, end);
-        Page<User> usersPage = new PageImpl<>(usersPageList, pageable, filteredUsers.size());
-
-        return usersPage.map(this::convertToUserResponseDTO);
+        Page<User> userPage = userRepository.findByUsernameStartingWithIgnoreCase(search, pageable);
+        return userPage.map(this::convertToUserResponseDTO);
     }
 }

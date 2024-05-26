@@ -48,4 +48,10 @@ public class GroupController {
         groupService.deleteGroup(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Group>> searchGroup(@RequestParam String name, Pageable pageable) {
+        Page<Group> groupPage = groupService.searchGroup(name, pageable);
+        return ResponseEntity.ok(groupPage);
+    }
 }
