@@ -79,4 +79,8 @@ public class GroupService {
         Page<Group> groupPage = groupRepository.findByNameStartingWithIgnoreCase(search, pageable);
         return groupPage.map(this::convertToGroupResponseDTO);
     }
+
+    public List<Group> getGroupsByUserId(Long userId) {
+        return groupRepository.findAllByUserIdsContains(userId);
+    }
 }

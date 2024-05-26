@@ -2,6 +2,7 @@ package org.fh.documentmanagementservice.user;
 
 import org.fh.documentmanagementservice.group.Group;
 import org.fh.documentmanagementservice.group.GroupRepository;
+import org.fh.documentmanagementservice.group.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,11 +18,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
+    private final GroupService groupService; // Inject GroupService
 
     @Autowired
-    public UserService(UserRepository userRepository, GroupRepository groupRepository) {
+    public UserService(UserRepository userRepository, GroupRepository groupRepository, GroupService groupService) {
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
+        this.groupService = groupService; // Initialize GroupService
     }
 
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
@@ -81,6 +84,12 @@ public class UserService {
         userResponseDTO.setUsername(user.getUsername());
         userResponseDTO.setEmail(user.getEmail());
         userResponseDTO.setIsAdmin(user.getIsAdmin());
+
+        List<Long> groupIds = groupService.getGroupsByUserId(user.getId())
+                .stream()
+                .map(Group::getId)
+                .collect(Collectors.toList());
+        userResponseDTO.setGroupIds(groupIds);
 
         return userResponseDTO;
     }

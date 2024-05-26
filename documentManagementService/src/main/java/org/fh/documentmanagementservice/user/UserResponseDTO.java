@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * Data Transfer Object (DTO) for User responses.
  * This class is used to transfer data between the server and the client during HTTP responses.
@@ -18,5 +20,5 @@ public class UserResponseDTO {
     private String username;
     private String email;
     private Boolean isAdmin;
-
+    private List<Long> groupIds;
 }
