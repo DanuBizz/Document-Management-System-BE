@@ -51,7 +51,11 @@ public class WebConfig implements WebMvcConfigurer {
         this.authorizationInterceptor = authorizationInterceptor;
         this.environment = environment;
     }
-
+    /**
+     * Adds the AuthorizationInterceptor to the InterceptorRegistry.
+     * This method adds the AuthorizationInterceptor to the InterceptorRegistry and excludes the "/usercontrol/**" path from the interceptor.
+     * @param registry The InterceptorRegistry object to add the AuthorizationInterceptor to.
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authorizationInterceptor)

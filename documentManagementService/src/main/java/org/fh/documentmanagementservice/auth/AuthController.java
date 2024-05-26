@@ -13,11 +13,19 @@ import java.net.http.HttpResponse;
 @RestController
 @RequestMapping(path = "/usercontrol")
 public class AuthController {
-
+    /**
+     * Get user control.
+     * @return
+     */
     @GetMapping
     public String getUserControl() {
         return "User accepted!";
     }
+
+    /**
+     * Post credentials.
+     * @return
+     */
     @PostMapping
     public HttpStatus postCredentials() {
         return HttpStatus.OK;
