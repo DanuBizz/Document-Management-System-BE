@@ -12,4 +12,7 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
     Page<DocumentVersion> findByDocumentNameAndIsLatestFalse(Pageable pageable, String documentName);
 
     List<DocumentVersion> findByDocumentIdAndIsLatestTrue(Long documentId);
+
+    Page<DocumentVersion> findByDocumentNameStartingWithIgnoreCase(String name, Pageable pageable);
+
 }

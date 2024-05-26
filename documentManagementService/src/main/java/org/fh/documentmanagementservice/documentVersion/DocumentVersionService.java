@@ -216,4 +216,8 @@ public class DocumentVersionService {
 
         return new FileSystemResource(filePath.toFile());
     }
+
+    public Page<DocumentVersion> searchDocumentVersions(String search, Pageable pageable) {
+        return documentVersionRepository.findByDocumentNameStartingWithIgnoreCase(search, pageable);
+    }
 }

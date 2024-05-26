@@ -66,4 +66,10 @@ public class DocumentVersionController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<DocumentVersion>> searchDocumentVersions(@RequestParam String search, Pageable pageable) {
+        Page<DocumentVersion> documentVersionPage = documentVersionService.searchDocumentVersions(search, pageable);
+        return ResponseEntity.ok(documentVersionPage);
+    }
 }
