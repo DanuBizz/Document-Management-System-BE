@@ -118,6 +118,13 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
+        List<Group> oldGroups = groupService.getGroupsByUserId(userId);
+
+        for (Group oldGroup : oldGroups) {
+            oldGroup.getUserIds().remove(userId);
+            groupRepository.save(oldGroup);
+        }
+
         for (Long groupId : groupIds) {
             Group group = groupRepository.findById(groupId).orElse(null);
 
