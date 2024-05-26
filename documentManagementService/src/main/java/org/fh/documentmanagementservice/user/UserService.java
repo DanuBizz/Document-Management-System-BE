@@ -253,7 +253,7 @@ public class UserService {
     }
 
     private DirContext getActiveDirectoryContext() throws Exception {
-        String username = activeDirectoryBindingUser;
+        //String username = activeDirectoryBindingUser;
         //String password = readActiveDirectoryBindingPassword();
 
         Hashtable<String, String> env = new Hashtable<>();
@@ -295,8 +295,8 @@ public class UserService {
         Attribute firstNameAttr = attributes.get("givenName");
         String firstName = (firstNameAttr != null) ? (String) firstNameAttr.get() : null;
 
-        Attribute lastNameAttr = attributes.get("sn");
-        String lastName = (lastNameAttr != null) ? (String) lastNameAttr.get() : null;
+        //Attribute lastNameAttr = attributes.get("sn");
+        //String lastName = (lastNameAttr != null) ? (String) lastNameAttr.get() : null;
         Attribute emailAttr = attributes.get("mail");
         String email = (emailAttr != null) ? (String) emailAttr.get() : null;
 
