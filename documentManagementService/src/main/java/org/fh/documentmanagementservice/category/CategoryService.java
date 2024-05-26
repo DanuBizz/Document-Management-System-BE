@@ -73,4 +73,9 @@ public class CategoryService {
                 .collect(Collectors.toList());
         return new CategoryResponseDTO(category.getId(), category.getName(), groupIds, groupNames);
     }
+
+    public Page<CategoryResponseDTO> searchCategories(String search, Pageable pageable) {
+        Page<Category> categoryPage = categoryRepository.findByNameStartingWithIgnoreCase(search, pageable);
+        return categoryPage.map(this::convertToCategoryResponseDTO);
+    }
 }

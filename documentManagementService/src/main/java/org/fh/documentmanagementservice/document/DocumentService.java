@@ -49,4 +49,8 @@ public class DocumentService {
         }
         documentRepository.deleteById(id);
     }
+
+    public Page<Document> searchDocuments(String search, Pageable pageable) {
+        return documentRepository.findByNameStartingWithIgnoreCase(search, pageable);
+    }
 }

@@ -1,5 +1,7 @@
 package org.fh.documentmanagementservice.document;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -10,4 +12,6 @@ import java.util.Optional;
  */
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     Optional<Document> findByName(String name);
+
+    Page<Document> findByNameStartingWithIgnoreCase(String name, Pageable pageable);
 }

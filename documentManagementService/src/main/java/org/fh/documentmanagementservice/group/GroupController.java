@@ -1,5 +1,6 @@
 package org.fh.documentmanagementservice.group;
 
+import org.fh.documentmanagementservice.user.UserResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,5 +47,11 @@ public class GroupController {
     public ResponseEntity<Void> deleteGroup(@PathVariable Long id) {
         groupService.deleteGroup(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<GroupResponseDTO>> searchGroups(@RequestParam String search, Pageable pageable) {
+        Page<GroupResponseDTO> groupPage = groupService.searchGroups(search, pageable);
+        return ResponseEntity.ok(groupPage);
     }
 }

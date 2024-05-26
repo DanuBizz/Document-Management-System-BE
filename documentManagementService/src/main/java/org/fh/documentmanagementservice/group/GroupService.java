@@ -2,6 +2,7 @@ package org.fh.documentmanagementservice.group;
 
 import org.fh.documentmanagementservice.user.User;
 import org.fh.documentmanagementservice.user.UserRepository;
+import org.fh.documentmanagementservice.user.UserResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -72,5 +73,10 @@ public class GroupService {
                 .map(User::getUsername)
                 .collect(Collectors.toList());
         return new GroupResponseDTO(group.getId(), group.getName(), userIds, usernames);
+    }
+
+    public Page<GroupResponseDTO> searchGroups(String search, Pageable pageable) {
+        Page<Group> groupPage = groupRepository.findByNameStartingWithIgnoreCase(search, pageable);
+        return groupPage.map(this::convertToGroupResponseDTO);
     }
 }

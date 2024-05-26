@@ -53,4 +53,10 @@ public class DocumentController {
         documentService.deleteDocument(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Document>> searchDocuments(@RequestParam String search, Pageable pageable) {
+        Page<Document> documentPage = documentService.searchDocuments(search, pageable);
+        return ResponseEntity.ok(documentPage);
+    }
 }
