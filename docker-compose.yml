@@ -26,3 +26,10 @@ services:
       - ./data_authentication:/var/lib/mysql
     ports:
       - "3307:3306"
+
+  mailhog:
+    image: mailhog/mailhog
+    restart: always
+    ports:
+      - 1025:1025
+      - 8025:8025

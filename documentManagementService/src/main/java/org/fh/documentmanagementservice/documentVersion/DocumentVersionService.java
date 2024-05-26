@@ -6,6 +6,10 @@ import org.fh.documentmanagementservice.category.CategoryRepository;
 import org.fh.documentmanagementservice.document.Document;
 import org.fh.documentmanagementservice.document.DocumentRepository;
 import org.fh.documentmanagementservice.document.DocumentService;
+import org.fh.documentmanagementservice.email.EmailService;
+import org.fh.documentmanagementservice.group.GroupRepository;
+import org.fh.documentmanagementservice.user.User;
+import org.fh.documentmanagementservice.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -14,9 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,6 +50,15 @@ public class DocumentVersionService {
 
     @Autowired
     private DocumentService documentService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private GroupRepository groupRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private static final Logger logger = Logger.getLogger(DocumentVersionService.class.getName());
 
@@ -97,12 +107,36 @@ public class DocumentVersionService {
 
         try {
             DocumentVersion savedDocumentVersion = documentVersionRepository.save(documentVersion);
-            return convertToResponseDTO(savedDocumentVersion);
+            boolean emailSent = sendEmailNotifications(documentVersion);
+            DocumentVersionResponseDTO responseDTO = convertToResponseDTO(savedDocumentVersion);
+            responseDTO.setEmailSent(emailSent);
+            return responseDTO;
         } catch (Exception e) {
-            // Log the exception to understand what went wrong
             logger.info("Error saving DocumentVersion: ");
-            throw e; // Re-throw the exception to be handled by the controller
+            throw e;
         }
+    }
+
+    private boolean sendEmailNotifications(DocumentVersion documentVersion) {
+        Set<Long> groupIds = documentVersion.getCategories().stream()
+                .flatMap(category -> category.getGroupIds().stream())
+                .collect(Collectors.toSet());
+
+        Set<Long> userIds = groupRepository.findAllById(groupIds).stream()
+                .flatMap(group -> group.getUserIds().stream())
+                .collect(Collectors.toSet());
+
+        List<User> users = userRepository.findAllById(userIds);
+        boolean allEmailsSent = true;
+
+        for (User user : users) {
+            boolean emailSent = emailService.sendDocumentNotification(user.getUsername(), user.getEmail(), documentVersion.getDocument().getName());
+            if (!emailSent) {
+                allEmailsSent = false;
+            }
+        }
+
+        return allEmailsSent;
     }
 
     public String storeFile(MultipartFile file, String documentName) throws IOException {

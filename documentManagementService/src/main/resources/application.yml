@@ -24,6 +24,18 @@ spring:
       path: /swagger-ui.html
     api-docs:
       path: /api-docs
+  mail:
+    host: localhost
+    port: 1025
+    username: ''
+    password: ''
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+            required: false
 
 logging:
   level:

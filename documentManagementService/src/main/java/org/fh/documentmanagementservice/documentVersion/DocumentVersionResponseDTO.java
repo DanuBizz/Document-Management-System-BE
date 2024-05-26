@@ -23,4 +23,5 @@ public class DocumentVersionResponseDTO {
     private Boolean isLatest;
     private Boolean isVisible;
     private DocumentOldVersionResponseDTO[] oldVersions;
+    private Boolean emailSent;
 }
