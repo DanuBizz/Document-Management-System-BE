@@ -68,8 +68,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}/groups")
-    public ResponseEntity<Void> updateUserGroups(@PathVariable Long id, @RequestBody List<String> groupNames) {
-        userService.updateUserGroups(id, groupNames);
+    public ResponseEntity<Void> updateUserGroups(@PathVariable Long id, @RequestBody List<Long> groupIds) {
+        userService.updateUserGroups(id, groupIds);
         return ResponseEntity.noContent().build();
     }
 }

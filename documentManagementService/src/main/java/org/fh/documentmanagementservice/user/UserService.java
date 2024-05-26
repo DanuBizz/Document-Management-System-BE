@@ -105,13 +105,12 @@ public class UserService {
         return userPage.map(this::convertToUserResponseDTO);
     }
 
-    public void updateUserGroups(Long userId, List<String> groupNames) {
-
+    public void updateUserGroups(Long userId, List<Long> groupIds) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
-        for (String groupName : groupNames) {
-            Group group = groupRepository.findByName(groupName);
+        for (Long groupId : groupIds) {
+            Group group = groupRepository.findById(groupId).orElse(null);
 
             if (group == null) {
                 continue;
