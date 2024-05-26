@@ -15,6 +15,6 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
 
     List<DocumentVersion> findByDocumentIdAndIsLatestTrue(Long documentId);
 
-    @Query("SELECT dv FROM DocumentVersion dv WHERE dv.isLatest = true AND LOWER(dv.document.name) LIKE LOWER(CONCAT(:name, '%')) ORDER BY dv.document.name")
+    @Query("SELECT dv FROM DocumentVersion dv WHERE dv.isLatest = true AND LOWER(dv.document.name) LIKE LOWER(CONCAT(:name, '%'))")
     Page<DocumentVersion> findByDocumentNameStartingWithIgnoreCaseAndIsLatestTrue(@Param("name") String name, Pageable pageable);
 }

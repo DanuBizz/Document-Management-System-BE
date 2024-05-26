@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -69,11 +66,33 @@ public class DocumentVersionService {
     public Page<DocumentVersionResponseDTO> getLatestWithAssociatedVersionsDTO(String search, Pageable pageable) {
         Page<DocumentVersion> documentVersions;
         if (search.isEmpty()) {
-            documentVersions = documentVersionRepository.findByIsLatestTrue(pageable);
+            documentVersions = documentVersionRepository.findByIsLatestTrue(Pageable.unpaged());
         } else {
-            documentVersions = documentVersionRepository.findByDocumentNameStartingWithIgnoreCaseAndIsLatestTrue(search, pageable);
+            documentVersions = documentVersionRepository.findByDocumentNameStartingWithIgnoreCaseAndIsLatestTrue(search, Pageable.unpaged());
         }
-        return documentVersions.map(this::convertToResponseDTO)
+
+        // Convert the Page to a List
+        List<DocumentVersion> documentVersionList = documentVersions.getContent();
+
+        // Sort the list based on the pageable's sort parameters
+        for (Sort.Order order : pageable.getSort()) {
+            documentVersionList.sort((dv1, dv2) -> {
+                // Assuming the sort parameter is the document's name
+                if (order.getProperty().equals("document.name")) {
+                    int comparison = dv1.getDocument().getName().compareTo(dv2.getDocument().getName());
+                    return order.isAscending() ? comparison : -comparison;
+                }
+                // Add more if-else blocks here if there are other sort parameters
+                return 0;
+            });
+        }
+
+        // Convert the sorted list back to a Page
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), documentVersionList.size());
+        Page<DocumentVersion> sortedDocumentVersions = new PageImpl<>(documentVersionList.subList(start, end), pageable, documentVersionList.size());
+
+        return sortedDocumentVersions.map(this::convertToResponseDTO)
                 .map(dto -> {
                     dto.setOldVersions(getNonLatestDocumentVersionsDTO(dto.getDocumentName()).toArray(new DocumentOldVersionResponseDTO[0]));
                     return dto;
