@@ -1,6 +1,10 @@
 package org.fh.documentmanagementservice.auth;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +28,20 @@ public class AuthController {
      */
     @PostMapping
     public HttpStatus postCredentials() {
+        return HttpStatus.OK;
+    }
+    /**
+     * Logout.
+     * @param request
+     * @param response
+     * @param authentication
+     * @return
+     */
+    @GetMapping(path = "/logout")
+    public HttpStatus logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        if (authentication != null) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
         return HttpStatus.OK;
     }
 }
