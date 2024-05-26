@@ -8,9 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
@@ -24,29 +23,39 @@ public class GroupService {
         this.userRepository = userRepository;
     }
 
-    public Group createGroup(GroupRequestDTO groupRequestDTO) {
+    public GroupResponseDTO createGroup(GroupRequestDTO groupRequestDTO) {
         Group group = new Group();
         group.setName(groupRequestDTO.getName());
-        Set<User> users = new HashSet<>(userRepository.findAllByUsernameIn(groupRequestDTO.getUsernames()));
-        group.setUsers(users);
-        return groupRepository.save(group);
+        Set<Long> userIds = userRepository.findAllByUsernameIn(groupRequestDTO.getUsernames())
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toSet());
+        group.setUserIds(userIds);
+        Group savedGroup = groupRepository.save(group);
+        return convertToGroupResponseDTO(savedGroup);
     }
 
-    public Page<Group> getAllGroups(Pageable pageable) {
-        return groupRepository.findAll(pageable);
-    }
-
-    public Optional<Group> getGroupById(Long id) {
-        return groupRepository.findById(id);
-    }
-
-    public Group updateGroup(Long id, GroupRequestDTO groupRequestDTO) {
-        Group group = getGroupById(id)
+    public GroupResponseDTO updateGroup(Long id, GroupRequestDTO groupRequestDTO) {
+        Group group = groupRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Group not found with id: " + id));
         group.setName(groupRequestDTO.getName());
-        Set<User> users = new HashSet<>(userRepository.findAllByUsernameIn(groupRequestDTO.getUsernames()));
-        group.setUsers(users);
-        return groupRepository.save(group);
+        Set<Long> userIds = userRepository.findAllByUsernameIn(groupRequestDTO.getUsernames())
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toSet());
+        group.setUserIds(userIds);
+        Group updatedGroup = groupRepository.save(group);
+        return convertToGroupResponseDTO(updatedGroup);
+    }
+
+    public GroupResponseDTO getGroupById(Long id) {
+        Group group = groupRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Group not found with id: " + id));
+        return convertToGroupResponseDTO(group);
+    }
+
+    public Page<GroupResponseDTO> getAllGroups(Pageable pageable) {
+        return groupRepository.findAll(pageable).map(this::convertToGroupResponseDTO);
     }
 
     public void deleteGroup(Long id) {
@@ -56,7 +65,12 @@ public class GroupService {
         groupRepository.deleteById(id);
     }
 
-    public Page<Group> searchGroup(String name, Pageable pageable) {
-        return groupRepository.findByNameStartingWithIgnoreCase(name, pageable);
+    private GroupResponseDTO convertToGroupResponseDTO(Group group) {
+        List<Long> userIds = new ArrayList<>(group.getUserIds());
+        List<String> usernames = userRepository.findAllById(userIds)
+                .stream()
+                .map(User::getUsername)
+                .collect(Collectors.toList());
+        return new GroupResponseDTO(group.getId(), group.getName(), userIds, usernames);
     }
 }

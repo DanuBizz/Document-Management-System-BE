@@ -19,39 +19,32 @@ public class GroupController {
     }
 
     @PostMapping
-    public ResponseEntity<Group> createGroup(@RequestBody GroupRequestDTO groupRequestDTO) {
-        Group group = groupService.createGroup(groupRequestDTO);
-        return new ResponseEntity<>(group, HttpStatus.CREATED);
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<Group>> getAllGroups(Pageable pageable) {
-        Page<Group> groupPage = groupService.getAllGroups(pageable);
-        return ResponseEntity.ok(groupPage);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Group> getGroupById(@PathVariable Long id) {
-        Group group = groupService.getGroupById(id)
-                .orElseThrow(() -> new RuntimeException("Group not found with id: " + id));
-        return ResponseEntity.ok(group);
+    public ResponseEntity<GroupResponseDTO> createGroup(@RequestBody GroupRequestDTO groupRequestDTO) {
+        GroupResponseDTO groupResponseDTO = groupService.createGroup(groupRequestDTO);
+        return new ResponseEntity<>(groupResponseDTO, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Group> updateGroup(@PathVariable Long id, @RequestBody GroupRequestDTO groupRequestDTO) {
-        Group group = groupService.updateGroup(id, groupRequestDTO);
-        return ResponseEntity.ok(group);
+    public ResponseEntity<GroupResponseDTO> updateGroup(@PathVariable Long id, @RequestBody GroupRequestDTO groupRequestDTO) {
+        GroupResponseDTO groupResponseDTO = groupService.updateGroup(id, groupRequestDTO);
+        return new ResponseEntity<>(groupResponseDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GroupResponseDTO> getGroupById(@PathVariable Long id) {
+        GroupResponseDTO groupResponseDTO = groupService.getGroupById(id);
+        return ResponseEntity.ok(groupResponseDTO);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<GroupResponseDTO>> getAllGroups(Pageable pageable) {
+        Page<GroupResponseDTO> groupPage = groupService.getAllGroups(pageable);
+        return ResponseEntity.ok(groupPage);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGroup(@PathVariable Long id) {
         groupService.deleteGroup(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<Page<Group>> searchGroup(@RequestParam String name, Pageable pageable) {
-        Page<Group> groupPage = groupService.searchGroup(name, pageable);
-        return ResponseEntity.ok(groupPage);
     }
 }

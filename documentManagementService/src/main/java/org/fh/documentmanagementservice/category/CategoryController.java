@@ -23,57 +23,33 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping
-    public ResponseEntity<Page<CategoryResponseDTO>> getAllCategories(Pageable pageable) {
-        Page<Category> categoryPage = categoryService.getAllCategories(pageable);
-        Page<CategoryResponseDTO> dtoPage = categoryPage.map(category -> {
-            List<Long> groupIds = category.getGroups().stream().map(Group::getId).collect(Collectors.toList());
-            List<String> groupNames = category.getGroups().stream().map(Group::getName).collect(Collectors.toList());
-            return new CategoryResponseDTO(category.getId(), category.getName(), groupIds, groupNames);
-        });
-        return ResponseEntity.ok(dtoPage);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> getCategoryById(@PathVariable Long id) {
-        Category category = categoryService.getCategoryById(id)
-                .orElseThrow(ResourceNotFoundException::new);
-        List<Long> groupIds = category.getGroups().stream().map(Group::getId).collect(Collectors.toList());
-        List<String> groupNames = category.getGroups().stream().map(Group::getName).collect(Collectors.toList());
-        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(
-                category.getId(), category.getName(), groupIds, groupNames);
-        return new ResponseEntity<>(categoryResponseDTO, HttpStatus.OK);
-    }
-
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> createCategory(@RequestBody CategoryRequestDTO categoryRequestDTO) {
-        Category category = categoryService.createCategory(categoryRequestDTO);
-        List<Long> groupIds = category.getGroups().stream().map(Group::getId).collect(Collectors.toList());
-        List<String> groupNames = category.getGroups().stream().map(Group::getName).collect(Collectors.toList());
-        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(
-                category.getId(), category.getName(), groupIds, groupNames);
+        CategoryResponseDTO categoryResponseDTO = categoryService.createCategory(categoryRequestDTO);
         return new ResponseEntity<>(categoryResponseDTO, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryUpdateDTO categoryUpdateDTO) {
-        Category updatedCategory = categoryService.updateCategory(id, categoryUpdateDTO);
-        List<Long> groupIds = updatedCategory.getGroups().stream().map(Group::getId).collect(Collectors.toList());
-        List<String> groupNames = updatedCategory.getGroups().stream().map(Group::getName).collect(Collectors.toList());
-        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(
-                updatedCategory.getId(), updatedCategory.getName(), groupIds, groupNames);
+    public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryRequestDTO categoryRequestDTO) {
+        CategoryResponseDTO categoryResponseDTO = categoryService.updateCategory(id, categoryRequestDTO);
         return new ResponseEntity<>(categoryResponseDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryResponseDTO> getCategoryById(@PathVariable Long id) {
+        CategoryResponseDTO categoryResponseDTO = categoryService.getCategoryById(id);
+        return ResponseEntity.ok(categoryResponseDTO);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<CategoryResponseDTO>> getAllCategories(Pageable pageable) {
+        Page<CategoryResponseDTO> categoryPage = categoryService.getAllCategories(pageable);
+        return ResponseEntity.ok(categoryPage);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<Page<Category>> searchCategories(@RequestParam String search, Pageable pageable) {
-        Page<Category> categoryPage = categoryService.searchCategories(search, pageable);
-        return ResponseEntity.ok(categoryPage);
+        return ResponseEntity.noContent().build();
     }
 }

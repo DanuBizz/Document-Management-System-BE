@@ -21,7 +21,8 @@ public class Group {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany
-    @JoinColumn(name = "group_id")
-    private Set<User> users = new HashSet<>();
+    @ElementCollection
+    @CollectionTable(name = "group_users", joinColumns = @JoinColumn(name = "group_id"))
+    @Column(name = "user_id")
+    private Set<Long> userIds = new HashSet<>();
 }

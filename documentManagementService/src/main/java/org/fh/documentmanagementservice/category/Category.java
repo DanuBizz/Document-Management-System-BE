@@ -21,7 +21,8 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany
-    @JoinColumn(name = "category_id")
-    private Set<Group> groups = new HashSet<>();
+    @ElementCollection
+    @CollectionTable(name = "category_groups", joinColumns = @JoinColumn(name = "category_id"))
+    @Column(name = "group_id")
+    private Set<Long> groupIds = new HashSet<>();
 }

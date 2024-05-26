@@ -11,7 +11,6 @@ services:
       MYSQL_PASSWORD: documentDB-pw
     volumes:
       - ./data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 3306:3306
 

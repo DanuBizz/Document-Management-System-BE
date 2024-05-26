@@ -1,15 +1,15 @@
 package org.fh.documentmanagementservice.category;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryRequestDTO {
     private String name;
-    private Set<Long> groupIds;
+    private List<String> groupNames;
 }
