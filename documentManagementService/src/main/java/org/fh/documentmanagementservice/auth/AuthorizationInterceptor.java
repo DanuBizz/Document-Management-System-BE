@@ -1,4 +1,4 @@
-package org.fh.usermanagementwebservice.auth;
+package org.fh.documentmanagementservice.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,18 +19,26 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 public class AuthorizationInterceptor implements HandlerInterceptor {
-
     @Value("${user.control.url}")
     private String userControlUrl;
-
+    /**
+     * This method is called before each REST request.
+     * It sends a request to the UserControl web service to check whether the user is authorized or not.
+     * @param request
+     * @param response
+     * @param handler
+     * @return
+     */
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
+        System.out.println(request.getHeader("Authorization"));
         headers.add("Authorization", request.getHeader("Authorization"));
         try {
             ResponseEntity<String> userControlResponse = restTemplate.exchange(userControlUrl, HttpMethod.GET, new HttpEntity<>(headers), String.class);
             if (userControlResponse.getStatusCode().is2xxSuccessful()) {
+                response.setStatus(HttpServletResponse.SC_OK);
                 return true;
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

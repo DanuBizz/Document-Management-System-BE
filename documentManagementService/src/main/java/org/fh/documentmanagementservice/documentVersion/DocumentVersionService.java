@@ -39,14 +39,29 @@ public class DocumentVersionService {
     @Autowired
     private DocumentService documentService;
 
+    /**
+     * Get all document versions as DTOs.
+     * @param pageable
+     * @return
+     */
     public Page<DocumentVersionResponseDTO> getAllDocumentVersionsDTO(Pageable pageable) {
         return getAllDocumentVersions(pageable).map(this::convertToResponseDTO);
     }
 
+    /**
+     * Get all document versions.
+     * @param pageable
+     * @return
+     */
     public Page<DocumentVersion> getAllDocumentVersions(Pageable pageable) {
         return documentVersionRepository.findAll(pageable);
     }
 
+    /**
+     * Get latest document versions with associated non-latest versions as DTOs.
+     * @param pageable
+     * @return
+     */
     public Page<DocumentVersionResponseDTO> getLatestWithAssociatedVersionsDTO(Pageable pageable) {
         Page<DocumentVersion> documentVersionPage = getLatestDocumentVersions(pageable);
         Page<DocumentVersionResponseDTO> dtoPage = documentVersionPage.map(this::convertToResponseDTO);
@@ -59,25 +74,51 @@ public class DocumentVersionService {
         return dtoPage;
     }
 
+    /**
+     * Get latest document versions.
+     * @param pageable
+     * @return
+     */
     public Page<DocumentVersion> getLatestDocumentVersions(Pageable pageable) {
         return documentVersionRepository.findByIsLatestTrue(pageable);
     }
 
+    /**
+     * Get non-latest document versions as DTOs.
+     * @param documentName
+     * @return
+     */
     public List<DocumentOldVersionResponseDTO> getNonLatestDocumentVersionsDTO(String documentName) {
         return getNonLatestDocumentVersions(documentName).map(this::convertToOldResponseDTO).getContent();
     }
 
+    /**
+     * Get non-latest document versions.
+     * @param documentName
+     * @return
+     */
     public Page<DocumentVersion> getNonLatestDocumentVersions(String documentName) {
         Pageable nonLatestPageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "timestamp"));
         return documentVersionRepository.findByDocumentNameAndIsLatestFalse(nonLatestPageable, documentName);
     }
 
+    /**
+     * Get document version by ID.
+     * @param id
+     * @return
+     */
     public DocumentVersionResponseDTO getDocumentVersion(Long id) {
         DocumentVersion documentVersion = documentVersionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid document version ID"));
         return convertToResponseDTO(documentVersion);
     }
 
+    /**
+     * Create a new document version.
+     * @param dto
+     * @return
+     * @throws IOException
+     */
     public DocumentVersionResponseDTO createDocumentVersion(DocumentVersionRequestDTO dto) throws IOException {
         Document document = documentRepository.findByName(dto.getName())
                 .orElseGet(() -> {
@@ -103,6 +144,12 @@ public class DocumentVersionService {
         return convertToResponseDTO(documentVersionRepository.save(documentVersion));
     }
 
+    /**
+     * Store a file.
+     * @param file
+     * @return
+     * @throws IOException
+     */
     public String storeFile(MultipartFile file) throws IOException {
         if (!file.isEmpty()) {
             String originalFilename = file.getOriginalFilename();
@@ -115,6 +162,11 @@ public class DocumentVersionService {
         }
     }
 
+    /**
+     * Collect categories.
+     * @param categoryIds
+     * @return
+     */
     public Set<Category> collectCategories(Set<Long> categoryIds) {
         return categoryIds.stream()
                 .map(id -> categoryRepository.findById(id)
@@ -122,6 +174,10 @@ public class DocumentVersionService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Update the latest version flag.
+     * @param document
+     */
     public void updateLatestVersionFlag(Document document) {
         document.getVersions().forEach(v -> {
             v.setIsLatest(false);
@@ -129,6 +185,11 @@ public class DocumentVersionService {
         });
     }
 
+    /**
+     * Convert a document version to a response DTO.
+     * @param documentVersion
+     * @return
+     */
     public DocumentVersionResponseDTO convertToResponseDTO(DocumentVersion documentVersion) {
         Set<String> categoryNames = documentVersion.getCategories().stream()
                 .map(Category::getName)
@@ -147,6 +208,11 @@ public class DocumentVersionService {
                 .build();
     }
 
+    /**
+     * Convert a document version to an old response DTO.
+     * @param documentVersion
+     * @return
+     */
     public DocumentOldVersionResponseDTO convertToOldResponseDTO(DocumentVersion documentVersion) {
         Set<String> categoryNames = documentVersion.getCategories().stream()
                 .map(Category::getName)
@@ -164,6 +230,11 @@ public class DocumentVersionService {
                 .build();
     }
 
+    /**
+     * Toggle the visibility of a document version.
+     * @param id
+     * @return
+     */
     public DocumentVersionResponseDTO toggleVisibility(Long id) {
         DocumentVersion documentVersion = documentVersionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid document version ID"));

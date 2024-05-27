@@ -25,6 +25,11 @@ public class UserDocumentService {
     @Autowired
     private UserDocumentReadRepository userDocumentReadRepository;
 
+    /**
+     * Mark a document as read.
+     * @param request
+     * @return
+     */
     @Transactional
     public UserDocumentReadResponseDTO markDocumentAsRead(UserDocumentReadRequestDTO request) {
         User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));

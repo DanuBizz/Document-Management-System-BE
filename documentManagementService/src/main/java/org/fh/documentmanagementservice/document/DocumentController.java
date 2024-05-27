@@ -23,12 +23,22 @@ public class DocumentController {
         this.documentService = documentService;
     }
 
+    /**
+     * Get all documents.
+     * @param pageable
+     * @return
+     */
     @GetMapping
     public ResponseEntity<Page<Document>> getAllDocuments(Pageable pageable) {
         Page<Document> documentPage = documentService.getAllDocuments(pageable);
         return ResponseEntity.ok(documentPage);
     }
 
+    /**
+     * Get a document by ID.
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Document> getDocumentById(@PathVariable Long id) {
         Document document = documentService.getDocumentById(id)
@@ -36,18 +46,34 @@ public class DocumentController {
         return new ResponseEntity<>(document, HttpStatus.OK);
     }
 
+    /**
+     * Create a document.
+     * @param documentRequestDTO
+     * @return
+     */
     @PostMapping
     public ResponseEntity<Document> createDocument(@RequestBody DocumentRequestDTO documentRequestDTO) {
         Document document = documentService.createDocument(documentRequestDTO);
         return new ResponseEntity<>(document, HttpStatus.CREATED);
     }
 
+    /**
+     * Update a document.
+     * @param id
+     * @param documentRequestDTO
+     * @return
+     */
     @PutMapping("/{id}")
     public ResponseEntity<Document> updateDocument(@PathVariable Long id, @RequestBody DocumentRequestDTO documentRequestDTO) {
         Document document = documentService.updateDocument(id, documentRequestDTO);
         return new ResponseEntity<>(document, HttpStatus.OK);
     }
 
+    /**
+     * Delete a document.
+     * @param id
+     * @return
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDocument(@PathVariable Long id) {
         documentService.deleteDocument(id);
