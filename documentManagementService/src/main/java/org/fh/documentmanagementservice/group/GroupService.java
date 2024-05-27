@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+/**
+ * Service class for Group related operations.
+ * This class contains the business logic for the Group entity.
+ */
 @Service
 public class GroupService {
 
@@ -23,7 +26,11 @@ public class GroupService {
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
     }
-
+    /**
+     * Create a new group.
+     * @param groupRequestDTO
+     * @return
+     */
     public GroupResponseDTO createGroup(GroupRequestDTO groupRequestDTO) {
         Group group = new Group();
         group.setName(groupRequestDTO.getName());
@@ -35,7 +42,12 @@ public class GroupService {
         Group savedGroup = groupRepository.save(group);
         return convertToGroupResponseDTO(savedGroup);
     }
-
+    /**
+     * Update an existing group.
+     * @param id
+     * @param groupRequestDTO
+     * @return
+     */
     public GroupResponseDTO updateGroup(Long id, GroupRequestDTO groupRequestDTO) {
         Group group = groupRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Group not found with id: " + id));
@@ -48,24 +60,39 @@ public class GroupService {
         Group updatedGroup = groupRepository.save(group);
         return convertToGroupResponseDTO(updatedGroup);
     }
-
+    /**
+     * Get a group by its ID.
+     * @param id
+     * @return
+     */
     public GroupResponseDTO getGroupById(Long id) {
         Group group = groupRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Group not found with id: " + id));
         return convertToGroupResponseDTO(group);
     }
-
+    /**
+     * Get all groups.
+     * @param pageable
+     * @return
+     */
     public Page<GroupResponseDTO> getAllGroups(Pageable pageable) {
         return groupRepository.findAll(pageable).map(this::convertToGroupResponseDTO);
     }
-
+    /**
+     * Delete a group by its ID.
+     * @param id
+     */
     public void deleteGroup(Long id) {
         if (!groupRepository.existsById(id)) {
             throw new RuntimeException("Group not found with id: " + id);
         }
         groupRepository.deleteById(id);
     }
-
+    /**
+     * Convert a Group entity to a GroupResponseDTO.
+     * @param group
+     * @return
+     */
     private GroupResponseDTO convertToGroupResponseDTO(Group group) {
         List<Long> userIds = new ArrayList<>(group.getUserIds());
         List<String> usernames = userRepository.findAllById(userIds)
@@ -74,12 +101,21 @@ public class GroupService {
                 .collect(Collectors.toList());
         return new GroupResponseDTO(group.getId(), group.getName(), userIds, usernames);
     }
-
+    /**
+     * Search for groups by name.
+     * @param search
+     * @param pageable
+     * @return
+     */
     public Page<GroupResponseDTO> searchGroups(String search, Pageable pageable) {
         Page<Group> groupPage = groupRepository.findByNameStartingWithIgnoreCase(search, pageable);
         return groupPage.map(this::convertToGroupResponseDTO);
     }
-
+    /**
+     * Get all groups by user ID.
+     * @param userId
+     * @return
+     */
     public List<Group> getGroupsByUserId(Long userId) {
         return groupRepository.findAllByUserIdsContains(userId);
     }

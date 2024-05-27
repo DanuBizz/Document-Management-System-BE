@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Set;
-
+/**
+ * This class represents the category update DTO.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

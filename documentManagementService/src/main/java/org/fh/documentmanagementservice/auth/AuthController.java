@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     /**
      * Get user control.
-     * @return
+     * @return User accepted!
      */
     @GetMapping
     public String getUserControl() {
@@ -24,7 +24,7 @@ public class AuthController {
 
     /**
      * Post credentials.
-     * @return
+     * @return HttpStatus.OK
      */
     @PostMapping
     public HttpStatus postCredentials() {
@@ -35,7 +35,7 @@ public class AuthController {
      * @param request
      * @param response
      * @param authentication
-     * @return
+     * @return HttpStatus.OK
      */
     @GetMapping(path = "/logout")
     public HttpStatus logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {

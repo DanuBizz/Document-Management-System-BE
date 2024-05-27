@@ -8,7 +8,9 @@ import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
-
+/**
+ * This class represents the category entity.
+ */
 @Entity
 @Table(name = "categories")
 @Getter

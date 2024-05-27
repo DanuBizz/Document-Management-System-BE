@@ -54,15 +54,15 @@ user:
 # variables
 active:
   directory:
-    url: ldap://localhost:10389  # URL for active directory
-    domain: example.com  # Domain for active directory
+    url: YOUR.ACTIVEDIRECTORY.URL  # URL for active directory
+    domain: YOUR.ACTIVEDIRECTORY.DOMAIN  # Domain for active directory
     search:
-      base: ou=people,dc=springframework,dc=org  # Base search path in active directory
+      base: ou=people,dc=springframework,dc=org  # Search path in active directory
       filter: (objectClass=person)  # Filter for searching in active directory
     binding:
       user: uid=admin,ou=system  # Binding user for active directory
 
-path:
+path: # Path to the file that contains the active directory binding password
   to:
     active-directory-binding-pwd: documentManagementService/src/main/resources/active-directory-binding-pwd.csv  # Path to the active directory binding password CSV file
 
@@ -72,4 +72,3 @@ logging:
     root: DEBUG  # Root logging level
     org.springframework: DEBUG  # Logging level for Spring framework
     org.springframework.data.rest: DEBUG  # Logging level for Spring Data REST
-    # org.springframework.web.servlet.mvc.method.annotation: DEBUG

@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-
+/**
+ * This class represents the category response DTO.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

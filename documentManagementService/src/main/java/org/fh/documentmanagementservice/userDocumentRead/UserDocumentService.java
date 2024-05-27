@@ -27,8 +27,8 @@ public class UserDocumentService {
 
     /**
      * Mark a document as read.
-     * @param request
-     * @return
+     * @param request The UserDocumentReadRequestDTO object containing the UserDocumentRead data.
+     * @return The UserDocumentReadResponseDTO object containing the updated UserDocumentRead data.
      */
     @Transactional
     public UserDocumentReadResponseDTO markDocumentAsRead(UserDocumentReadRequestDTO request) {

@@ -7,7 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Set;
-
+/**
+ * Data Transfer Object (DTO) for DocumentVersion responses.
+ * This class is used to transfer data between the server and the client during HTTP responses.
+ * It includes the necessary information to represent a DocumentVersion in the response.
+ */
 @Data
 @Builder
 @NoArgsConstructor
