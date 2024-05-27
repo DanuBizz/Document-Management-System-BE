@@ -2,14 +2,14 @@ package org.fh.documentmanagementservice.group;
 
 import org.fh.documentmanagementservice.user.User;
 import org.fh.documentmanagementservice.user.UserRepository;
-import org.fh.documentmanagementservice.user.UserResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service

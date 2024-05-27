@@ -1,8 +1,10 @@
 package org.fh.documentmanagementservice.group;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.fh.documentmanagementservice.user.User;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;

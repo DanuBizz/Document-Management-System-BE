@@ -57,7 +57,7 @@ public class DocumentVersionService {
     @Autowired
     private UserRepository userRepository;
 
-    private static final Logger logger = Logger.getLogger(DocumentVersionService.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DocumentVersionService.class.getName());
 
     public Page<DocumentVersionResponseDTO> getAllDocumentVersionsDTO(Pageable pageable) {
         return documentVersionRepository.findAll(pageable).map(this::convertToResponseDTO);
@@ -89,7 +89,7 @@ public class DocumentVersionService {
 
         // Convert the sorted list back to a Page
         int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), documentVersionList.size());
+        int end = Math.min(start + pageable.getPageSize(), documentVersionList.size());
         Page<DocumentVersion> sortedDocumentVersions = new PageImpl<>(documentVersionList.subList(start, end), pageable, documentVersionList.size());
 
         return sortedDocumentVersions.map(this::convertToResponseDTO)
@@ -136,7 +136,7 @@ public class DocumentVersionService {
             responseDTO.setEmailSent(emailSent);
             return responseDTO;
         } catch (Exception e) {
-            logger.info("Error saving DocumentVersion: ");
+            LOGGER.info("Error saving DocumentVersion: ");
             throw e;
         }
     }

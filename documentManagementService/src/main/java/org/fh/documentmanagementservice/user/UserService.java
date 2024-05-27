@@ -6,7 +6,6 @@ import org.fh.documentmanagementservice.group.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -341,7 +340,7 @@ public class UserService {
     }
 
     public void updateUserGroups(Long userId, List<Long> groupIds) {
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
         List<Group> oldGroups = groupService.getGroupsByUserId(userId);

@@ -1,6 +1,5 @@
 package org.fh.documentmanagementservice.group;
 
-import org.fh.documentmanagementservice.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
