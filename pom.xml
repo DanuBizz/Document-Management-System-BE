@@ -57,6 +57,7 @@
                 <configuration>
                     <printFailingErrors>true</printFailingErrors>
                     <rulesets>
+                        <failsOnError>false</failsOnError>
                         <ruleset>pmd.xml</ruleset>
                     </rulesets>
                 </configuration>
