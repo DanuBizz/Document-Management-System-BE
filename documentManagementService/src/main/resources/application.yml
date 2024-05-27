@@ -16,7 +16,7 @@ spring:
         format_sql: true  # Format SQL for better readability
         use_sql_comments: true  # Include comments in generated SQL
         dialect: org.hibernate.dialect.MariaDBDialect  # Database dialect
-  devtools:
+  devtools: # Tool for Hot-Reloading
     restart:
       enabled: true
   springdoc:
