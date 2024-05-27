@@ -1,6 +1,9 @@
 package org.fh.documentmanagementservice.documentVersion;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.fh.documentmanagementservice.category.Category;
 import org.fh.documentmanagementservice.document.Document;
 
@@ -25,11 +28,9 @@ public class DocumentVersion {
 
     @ManyToOne
     @JoinColumn(name = "document_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Document document;
 
-    @Column(name = "file_path", nullable = false)
+    @Column(name= "file_path", nullable = false)
     private String filepath;
 
     @Column(nullable = false)
@@ -44,11 +45,11 @@ public class DocumentVersion {
     private Set<Category> categories;
 
     @Column(nullable = false)
-    private Boolean isRead;
+    private Boolean isRead = false;
 
     @Column(nullable = false)
-    private Boolean isLatest;
+    private Boolean isLatest = false;
 
     @Column(nullable = false)
-    private Boolean isVisible;
+    private Boolean isVisible = true;
 }

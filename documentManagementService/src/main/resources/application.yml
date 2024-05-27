@@ -1,7 +1,6 @@
 spring:
   application:
     name: DocumentManagementService
-    file-directory: "C:\\Users\\Hasnat\\Downloads\\KBB-test\\"
   datasource:
     url: jdbc:mariadb://localhost:3306/documentDB
     username: KBB-dev
@@ -16,29 +15,50 @@ spring:
         format_sql: true
         use_sql_comments: true
         dialect: org.hibernate.dialect.MariaDBDialect
-  devtools:
-    restart:
-      enabled: true
   springdoc:
     swagger-ui:
       path: /swagger-ui.html
     api-docs:
       path: /api-docs
-  mail:
-    host: localhost
-    port: 1025
-    username: ''
-    password: ''
-    properties:
-      mail:
-        smtp:
-          auth: false
-          starttls:
-            enable: false
-            required: false
+  profiles:
+    active: prod
+  ldap:
+    embedded:
+      port: 8389
+      base-dn: dc=springframework,dc=org
+      ldif: classpath:test-server.ldif
+server:
+  port: 8080
+# discovery client
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://127.0.0.1:8081/eureka/
+user:
+  control:
+    url: http://localhost:8080/usercontrol
+# variables
+active:
+  directory:
+    url: ldap://localhost:10389
+    domain: example.com
+    search:
+      base: ou=people,dc=springframework,dc=org
+      filter: (objectClass=person)
+    binding:
+      user: uid=admin,ou=system
 
+  # variables
+  # ATTENTION: If you want to start the services from your root folder instead, like e.g. IntelliJ does by default,
+  # don't forget to add the following prefix is required in front of the current path: userManagementWebservice/
+  # Example: userManagementWebservice/src/main/resources/ instead of src/main/resources/
+path:
+  to:
+    active-directory-binding-pwd: documentManagementService/src/main/resources/active-directory-binding-pwd.csv
 logging:
   level:
+    root: DEBUG
+    org.springframework: DEBUG
     org.springframework.data.rest: DEBUG
     org.springframework.web.servlet.mvc.method.annotation: DEBUG
     # org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG

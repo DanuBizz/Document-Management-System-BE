@@ -1,30 +1,28 @@
 package org.fh.documentmanagementservice.user;
 
-import org.fh.documentmanagementservice.group.Group;
-import org.fh.documentmanagementservice.group.GroupRepository;
-import org.fh.documentmanagementservice.group.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.*;
+import java.io.BufferedReader;
+import java.util.*;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
-    private final GroupRepository groupRepository;
-    private final GroupService groupService; // Inject GroupService
 
     @Autowired
-    public UserService(UserRepository userRepository, GroupRepository groupRepository, GroupService groupService) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.groupRepository = groupRepository;
-        this.groupService = groupService; // Initialize GroupService
     }
 
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
@@ -50,6 +48,16 @@ public class UserService {
             return convertToUserResponseDTO(userOptional.get());
         } else {
             throw new RuntimeException("User not found with id: " + id);
+        }
+    }
+
+    public UserResponseDTO findUserByUsername(String username) {
+        Optional<User> userOptional = userRepository.findUserByUsername(username);
+
+        if (userOptional.isPresent()) {
+            return convertToUserResponseDTO(userOptional.get());
+        } else {
+            throw new RuntimeException("User not found with username: " + username);
         }
     }
 
@@ -85,55 +93,167 @@ public class UserService {
         userResponseDTO.setEmail(user.getEmail());
         userResponseDTO.setIsAdmin(user.getIsAdmin());
 
-        List<Long> groupIds = groupService.getGroupsByUserId(user.getId())
-                .stream()
-                .map(Group::getId)
-                .collect(Collectors.toList());
-        userResponseDTO.setGroupIds(groupIds);
-
         return userResponseDTO;
     }
 
-    public UserResponseDTO toggleUserAdminStatus(Long id) {
-        Optional<User> userOptional = userRepository.findById(id);
+    @Value("${active.directory.url}")
+    private String activeDirectoryUrl;
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setIsAdmin(!user.getIsAdmin());
+    @Value("${active.directory.search.base}")
+    private String activeDirectorySearchBase;
 
-            User updatedUser = userRepository.save(user);
+    @Value("${active.directory.search.filter}")
+    private String activeDirectorySearchFilter;
 
-            return convertToUserResponseDTO(updatedUser);
+    @Value("${active.directory.binding.user}")
+    private String activeDirectoryBindingUser;
+
+    @Value("${path.to.active-directory-binding-pwd}")
+    private String pathToActiveDirectoryBindingPwdCsv;
+
+    // GET or create one user, if it doesn't exist already
+    public User getUserData(String username) throws Exception {
+        User user = userRepository.findByUserLogonName(username);
+        if (user != null) {
+            return userRepository.saveAndFlush(user);
         } else {
-            throw new RuntimeException("User not found with id: " + id);
+            User activeDirectoryUserData = getActiveDirectoryUserData(username);
+            return userRepository.saveAndFlush(
+                    new User(
+                            activeDirectoryUserData.getUsername(),
+                            activeDirectoryUserData.getEmail(),
+                            false
+                    )
+            );
         }
     }
 
-    public Page<UserResponseDTO> searchUsers(String search, Pageable pageable) {
-        Page<User> userPage = userRepository.findByUsernameStartingWithIgnoreCase(search, pageable);
-        return userPage.map(this::convertToUserResponseDTO);
+    // GET all active directory members
+    public List<User> getAllActiveDirectoryUserData() throws Exception {
+        List<User> activeDirectoryUserList = new ArrayList<>();
+        addAllActiveDirectoryMembersToList(activeDirectoryUserList);
+        return activeDirectoryUserList;
     }
 
-    public void updateUserGroups(Long userId, List<Long> groupIds) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-        List<Group> oldGroups = groupService.getGroupsByUserId(userId);
-
-        for (Group oldGroup : oldGroups) {
-            oldGroup.getUserIds().remove(userId);
-            groupRepository.save(oldGroup);
+    // GET all user data
+    // checks if user is super admin and returns all users if true
+    public List<User> getAllUsersData(Long id) {
+        User admin = userRepository.findByUserId(id);
+        if (admin.getIsAdmin()) {
+            List<User> allUsers = userRepository.findAll();
+            allUsers.sort(Comparator.naturalOrder());
+            return allUsers;
+        } else {
+            return null;
         }
+    }
 
-        for (Long groupId : groupIds) {
-            Group group = groupRepository.findById(groupId).orElse(null);
+    // GET users username
+    public UserNameDTO getUsername(long id) {
+        User user = userRepository.findByUserId(id);
+        return new UserNameDTO(user.getId(), user.getUsername());
+    }
 
-            if (group == null) {
-                continue;
+    // GET all users usernames
+    public List<UserNameDTO> getAllUsernames() {
+        List<User> allUsersList = userRepository.findAll();
+        List<UserNameDTO> allUsernamesDTOList = new ArrayList<>();
+        for (User user : allUsersList) {
+            allUsernamesDTOList.add(new UserNameDTO(user.getId(), user.getUsername()));
+        }
+        allUsernamesDTOList.sort(Comparator.naturalOrder());
+        return allUsernamesDTOList;
+    }
+
+    // GET all usernames from list
+    public List<UserNameDTO> getUsernameFromList(List<UserNameDTO> userNameDTOList) {
+        for (UserNameDTO userNameDTO : userNameDTOList) {
+            User user = userRepository.findByUserId(userNameDTO.getId());
+            userNameDTO.setName(user.getUsername());
+        }
+        userNameDTOList.sort(Comparator.naturalOrder());
+        return userNameDTOList;
+    }
+
+    // ####################### Active Directory #######################
+
+    private User getActiveDirectoryUserData(String username) throws Exception {
+        DirContext context = getActiveDirectoryContext();
+        NamingEnumeration<SearchResult> results = getActiveDirectorySearchResult(context);
+        while (results.hasMore()) {
+            User user = getUserDataFromActiveDirectorySearchResult(results.next());
+            if (username.equalsIgnoreCase(user.getUsername())) {
+                context.close();
+                return user;
             }
-
-            group.getUserIds().add(userId);
-            groupRepository.save(group);
         }
+        context.close();
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found in Active Directory!");
     }
+
+    private void addAllActiveDirectoryMembersToList(List<User> activeDirectoryUserList) throws Exception {
+        DirContext context = getActiveDirectoryContext();
+        NamingEnumeration<SearchResult> results = getActiveDirectorySearchResult(context);
+        while (results.hasMore()) {
+            User user = getUserDataFromActiveDirectorySearchResult(results.next());
+            activeDirectoryUserList.add(user);
+        }
+        context.close();
+    }
+
+    private DirContext getActiveDirectoryContext() throws Exception {
+        String username = activeDirectoryBindingUser;
+        //String password = readActiveDirectoryBindingPassword();
+
+        Hashtable<String, String> env = new Hashtable<>();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, "ldap://localhost:8389/dc=springframework,dc=org");
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        //env.put(Context.SECURITY_PRINCIPAL, username);
+        //env.put(Context.SECURITY_CREDENTIALS, password);
+
+        return new InitialDirContext(env);
+    }
+
+    /*private String readActiveDirectoryBindingPassword() throws Exception {
+        BufferedReader br = new BufferedReader(new java.io.FileReader(pathToActiveDirectoryBindingPwdCsv));
+        String password = br.readLine();
+        System.out.println("Password: " + password);
+        br.close();
+        return password;
+    }*/
+
+    private NamingEnumeration<SearchResult> getActiveDirectorySearchResult(DirContext context) throws NamingException {
+        String searchBase = activeDirectorySearchBase;
+        String searchFilter = activeDirectorySearchFilter;
+
+        SearchControls controls = new SearchControls();
+        controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        String[] attributesToRetrieve = {
+                "userPrincipalName",    // user logon name
+                "userAccountControl",   // if user is activated or deactivated
+                "givenName",            // first name
+                "sn",                   // last name
+                "mail"                  // e-mail address
+        };
+        controls.setReturningAttributes(attributesToRetrieve);
+
+        return context.search(searchBase, searchFilter, controls);
+    }
+
+    private User getUserDataFromActiveDirectorySearchResult(SearchResult searchResult) throws NamingException {
+        Attributes attributes = searchResult.getAttributes();
+
+        Attribute userPrincipalNameAttr = attributes.get("userPrincipalName");
+        String userPrincipalName = (userPrincipalNameAttr != null) ? (String) userPrincipalNameAttr.get() : null;
+        if (userPrincipalName != null) {
+            userPrincipalName = userPrincipalName.split("@")[0];
+        }
+
+        Attribute emailAttr = attributes.get("mail");
+        String email = (emailAttr != null) ? (String) emailAttr.get() : null;
+
+        return new User(userPrincipalName, email, false);
+    }
+
 }

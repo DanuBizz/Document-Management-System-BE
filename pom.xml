@@ -10,8 +10,6 @@
     <description>KulturBetriebeBurgenland-BE</description>
     <modules>
         <module>documentManagementService</module>
-        <module>userManagementWebservice</module>
-        <module>userControlWebservice</module>
     </modules>
     <properties>
         <java.version>17</java.version>
