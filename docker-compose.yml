@@ -11,6 +11,12 @@ services:
       MYSQL_PASSWORD: documentDB-pw
     volumes:
       - ./data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 3306:3306
+
+  mailhog:
+    image: mailhog/mailhog
+    restart: always
+    ports:
+      - 1025:1025
+      - 8025:8025

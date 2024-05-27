@@ -1,4 +1,4 @@
-package org.fh.documentmanagementservice.category;
+package org.fh.documentmanagementservice.group;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryRequestDTO {
+public class GroupResponseDTO {
+    private Long id;
     private String name;
-    private List<String> groupNames;
+    private List<Long> userIds;
+    private List<String> usernames;
 }
+

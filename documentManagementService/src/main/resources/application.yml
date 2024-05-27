@@ -1,6 +1,7 @@
 spring:
   application:
     name: DocumentManagementService  # Name of the Spring application
+    file-directory: "C:\\Users\\Hasnat\\Downloads\\KBB-test\\"
   datasource:
     url: jdbc:mariadb://localhost:3306/documentDB  # URL for the MariaDB datasource
     username: KBB-dev  # Username for database connection
@@ -15,12 +16,26 @@ spring:
         format_sql: true  # Format SQL for better readability
         use_sql_comments: true  # Include comments in generated SQL
         dialect: org.hibernate.dialect.MariaDBDialect  # Database dialect
-
+  devtools: # Tool for Hot-Reloading
+    restart:
+      enabled: true
   springdoc:
     swagger-ui:
       path: /swagger-ui.html  # Path for Swagger UI
     api-docs:
       path: /api-docs  # Path for API documentation
+  mail:
+    host: localhost
+    port: 1025
+    username: ''
+    password: ''
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+            required: false
   profiles:
     active: prod  # Active Spring profile
   ldap:
@@ -50,6 +65,7 @@ active:
 path:
   to:
     active-directory-binding-pwd: documentManagementService/src/main/resources/active-directory-binding-pwd.csv  # Path to the active directory binding password CSV file
+
 
 logging:
   level:

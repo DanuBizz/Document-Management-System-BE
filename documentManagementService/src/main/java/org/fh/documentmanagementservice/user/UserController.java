@@ -94,4 +94,22 @@ public class UserController {
     public List<UserNameDTO> getUsernamesFromList(@RequestBody List<UserNameDTO> userNameDTOList) {
         return userService.getUsernameFromList(userNameDTOList);
     }
+
+    @PutMapping("/{id}/toggle-admin")
+    public ResponseEntity<UserResponseDTO> toggleUserAdminStatus(@PathVariable Long id) {
+        UserResponseDTO userResponseDTO = userService.toggleUserAdminStatus(id);
+        return ResponseEntity.ok(userResponseDTO);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<UserResponseDTO>> searchUsers(@RequestParam String search, Pageable pageable) {
+        Page<UserResponseDTO> userPage = userService.searchUsers(search, pageable);
+        return ResponseEntity.ok(userPage);
+    }
+
+    @PutMapping("/{id}/groups")
+    public ResponseEntity<Void> updateUserGroups(@PathVariable Long id, @RequestBody List<Long> groupIds) {
+        userService.updateUserGroups(id, groupIds);
+        return ResponseEntity.noContent().build();
+    }
 }

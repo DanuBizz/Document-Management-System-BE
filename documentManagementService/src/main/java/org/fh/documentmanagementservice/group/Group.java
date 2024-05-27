@@ -1,4 +1,4 @@
-package org.fh.documentmanagementservice.category;
+package org.fh.documentmanagementservice.group;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,12 +10,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "groups")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Category {
+public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +24,7 @@ public class Category {
     private String name;
 
     @ElementCollection
-    @CollectionTable(name = "category_groups", joinColumns = @JoinColumn(name = "category_id"))
-    @Column(name = "group_id")
-    private Set<Long> groupIds = new HashSet<>();
+    @CollectionTable(name = "group_users", joinColumns = @JoinColumn(name = "group_id"))
+    @Column(name = "user_id")
+    private Set<Long> userIds = new HashSet<>();
 }

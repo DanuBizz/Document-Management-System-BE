@@ -1,14 +1,11 @@
 package org.fh.documentmanagementservice.document;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.fh.documentmanagementservice.documentVersion.DocumentVersion;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entity class for Document.
@@ -18,7 +15,6 @@ import java.util.Set;
 @Entity
 @Table(name = "documents")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Document {
@@ -26,9 +22,11 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
-    private Set<DocumentVersion> versions = new HashSet<>();
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<DocumentVersion> versions = new ArrayList<>();
 }
