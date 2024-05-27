@@ -66,7 +66,6 @@ INSERT INTO users (username, email, is_admin) VALUES
                                                   ('bob_brown', 'bob.brown@example.com', TRUE),
                                                   ('charlie_clark', 'charlie.clark@example.com', FALSE),
                                                   ('emily_evans', 'emily.evans@example.com', FALSE),
-                                                  ('admin', 'admin@example.com', TRUE),
                                                   ('david_wilson', 'david.wilson@example.com', FALSE);
 
 -- Insert test data for documents
@@ -94,3 +93,33 @@ INSERT INTO user_category (category_id, user_id) VALUES
                                                      (3, 5),
                                                      (4, 6),
                                                      (5, 7);
+
+
+-- Insert into doc_versions table
+INSERT INTO document_versions (document_id, file_path, timestamp, is_read, is_latest, is_visible) VALUES (1, 'C:\Users\mike\KBB-test', '2024-01-01T15:00:00', false, true, true);
+INSERT INTO document_versions (document_id, file_path, timestamp, is_read, is_latest, is_visible) VALUES (1, 'C:\Users\mike\KBB-test', '2023-01-01T15:00:00', false, false, false);
+INSERT INTO document_versions (document_id, file_path, timestamp, is_read, is_latest, is_visible) VALUES (1, 'C:\Users\mike\KBB-test', '2022-01-01T15:00:00', false, false, true);
+INSERT INTO document_versions (document_id, file_path, timestamp, is_read, is_latest, is_visible) VALUES (2, 'C:\Users\mike\KBB-test', '2024-01-01T15:00:00', false, true, true);
+INSERT INTO document_versions (document_id, file_path, timestamp, is_read, is_latest, is_visible) VALUES (3, 'C:\Users\mike\KBB-test', '2024-01-01T15:00:00', false, true, true);
+INSERT INTO document_versions (document_id, file_path, timestamp, is_read, is_latest, is_visible) VALUES (4, 'C:\Users\mike\KBB-test', '2024-01-01T15:00:00', false, true, true);
+INSERT INTO document_versions (document_id, file_path, timestamp, is_read, is_latest, is_visible) VALUES (4, 'C:\Users\mike\KBB-test', '2023-01-01T15:00:00', false, false, true);
+-- Insert document_versions category
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (1, 1);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (1, 2);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (1, 3);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (2, 1);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (2, 2);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (2, 3);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (3, 1);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (3, 2);
+
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (4, 1);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (4, 2);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (4, 3);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (5, 1);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (5, 2);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (5, 3);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (6, 1);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (6, 2);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (7, 1);
+INSERT INTO document_version_category (document_version_id, category_id) VALUES (7, 2);

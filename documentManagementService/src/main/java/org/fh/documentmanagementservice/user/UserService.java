@@ -1,8 +1,12 @@
 package org.fh.documentmanagementservice.user;
 
+import org.fh.documentmanagementservice.group.Group;
+import org.fh.documentmanagementservice.group.GroupRepository;
+import org.fh.documentmanagementservice.group.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,6 +17,7 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -33,14 +38,19 @@ public class UserService {
     private String pathToActiveDirectoryBindingPwdCsv;
 
     private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
+    private final GroupService groupService; // Inject GroupService
+
     /**
      * Constructor injecting UserRepository dependency.
      *
      * @param userRepository Repository for User entities.
      */
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, GroupRepository groupRepository, GroupService groupService) {
         this.userRepository = userRepository;
+        this.groupRepository = groupRepository;
+        this.groupService = groupService; // Initialize GroupService
     }
     /**
      * Creates a new user.
@@ -128,6 +138,12 @@ public class UserService {
         userResponseDTO.setUsername(user.getUsername());
         userResponseDTO.setEmail(user.getEmail());
         userResponseDTO.setIsAdmin(user.getIsAdmin());
+
+        List<Long> groupIds = groupService.getGroupsByUserId(user.getId())
+                .stream()
+                .map(Group::getId)
+                .collect(Collectors.toList());
+        userResponseDTO.setGroupIds(groupIds);
 
         return userResponseDTO;
     }
@@ -303,4 +319,47 @@ public class UserService {
         return new User(firstName, email, false);
     }
 
+
+    public UserResponseDTO toggleUserAdminStatus(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setIsAdmin(!user.getIsAdmin());
+
+            User updatedUser = userRepository.save(user);
+
+            return convertToUserResponseDTO(updatedUser);
+        } else {
+            throw new RuntimeException("User not found with id: " + id);
+        }
+    }
+
+    public Page<UserResponseDTO> searchUsers(String search, Pageable pageable) {
+        Page<User> userPage = userRepository.findByUsernameStartingWithIgnoreCase(search, pageable);
+        return userPage.map(this::convertToUserResponseDTO);
+    }
+
+    public void updateUserGroups(Long userId, List<Long> groupIds) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        List<Group> oldGroups = groupService.getGroupsByUserId(userId);
+
+        for (Group oldGroup : oldGroups) {
+            oldGroup.getUserIds().remove(userId);
+            groupRepository.save(oldGroup);
+        }
+
+        for (Long groupId : groupIds) {
+            Group group = groupRepository.findById(groupId).orElse(null);
+
+            if (group == null) {
+                continue;
+            }
+
+            group.getUserIds().add(userId);
+            groupRepository.save(group);
+        }
+    }
 }
