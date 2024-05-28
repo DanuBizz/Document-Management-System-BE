@@ -37,7 +37,10 @@ public class UserDocumentReadService {
         DocumentVersion documentVersion = documentVersionRepository.findById(request.getDocumentVersionId())
                 .orElseThrow(() -> new RuntimeException("Document version not found"));
 
-        UserDocumentRead userDocumentRead = new UserDocumentRead();
+        UserDocumentRead userDocumentRead = userDocumentReadRepository.findByUserAndDocumentVersion(user, documentVersion)
+                .stream().findFirst()
+                .orElse(new UserDocumentRead());
+
         userDocumentRead.setUser(user);
         userDocumentRead.setDocumentVersion(documentVersion);
         userDocumentRead.setHasRead(true);
