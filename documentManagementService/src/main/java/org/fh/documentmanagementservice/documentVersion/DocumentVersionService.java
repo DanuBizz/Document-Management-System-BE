@@ -9,6 +9,7 @@ import org.fh.documentmanagementservice.document.DocumentService;
 import org.fh.documentmanagementservice.email.EmailService;
 import org.fh.documentmanagementservice.group.GroupRepository;
 import org.fh.documentmanagementservice.user.User;
+import org.fh.documentmanagementservice.group.Group;
 import org.fh.documentmanagementservice.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,37 +67,53 @@ public class DocumentVersionService {
     public Page<DocumentVersionResponseDTO> getLatestWithAssociatedVersionsDTO(String search, Pageable pageable) {
         Page<DocumentVersion> documentVersions;
         if (search.isEmpty()) {
-            documentVersions = documentVersionRepository.findByIsLatestTrue(Pageable.unpaged());
+            documentVersions = documentVersionRepository.findByIsLatestTrue(pageable);
         } else {
-            documentVersions = documentVersionRepository.findByDocumentNameStartingWithIgnoreCaseAndIsLatestTrue(search, Pageable.unpaged());
+            documentVersions = documentVersionRepository.findByDocumentNameStartingWithIgnoreCaseAndIsLatestTrue(search, pageable);
         }
-
-        // Convert the Page to a List
-        List<DocumentVersion> documentVersionList = documentVersions.getContent();
-
-        // Sort the list based on the pageable's sort parameters
-        for (Sort.Order order : pageable.getSort()) {
-            documentVersionList.sort((dv1, dv2) -> {
-                // Assuming the sort parameter is the document's name
-                if (order.getProperty().equals("document.name")) {
-                    int comparison = dv1.getDocument().getName().compareTo(dv2.getDocument().getName());
-                    return order.isAscending() ? comparison : -comparison;
-                }
-                // Add more if-else blocks here if there are other sort parameters
-                return 0;
-            });
-        }
-
-        // Convert the sorted list back to a Page
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), documentVersionList.size());
-        Page<DocumentVersion> sortedDocumentVersions = new PageImpl<>(documentVersionList.subList(start, end), pageable, documentVersionList.size());
-
-        return sortedDocumentVersions.map(this::convertToResponseDTO)
+        return documentVersions.map(this::convertToResponseDTO)
                 .map(dto -> {
                     dto.setOldVersions(getNonLatestDocumentVersionsDTO(dto.getDocumentName()).toArray(new DocumentOldVersionResponseDTO[0]));
                     return dto;
                 });
+    }
+
+    public Page<DocumentVersionResponseDTO> getLatestWithAssociatedVersionsDTOForUser(String userName, String search, Pageable pageable) {
+        User user = userRepository.findByUsername(userName)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user name"));
+
+        Page<DocumentVersion> documentVersions;
+        if (search.isEmpty()) {
+            documentVersions = documentVersionRepository.findByIsLatestTrue(pageable);
+        } else {
+            documentVersions = documentVersionRepository.findByDocumentNameStartingWithIgnoreCaseAndIsLatestTrue(search, pageable);
+        }
+
+        return (Page<DocumentVersionResponseDTO>) documentVersions
+                .filter(documentVersion -> isDocumentAssignedToUser(documentVersion, user))
+                .map(this::convertToResponseDTO)
+                .map(dto -> {
+                    dto.setOldVersions(getNonLatestDocumentVersionsDTO(dto.getDocumentName()).toArray(new DocumentOldVersionResponseDTO[0]));
+                    return dto;
+                });
+    }
+
+    private boolean isDocumentAssignedToUser(DocumentVersion documentVersion, User user) {
+        // Check if the document is assigned to the user's groups
+        Set<Long> userGroupIds = groupRepository.findAllByUserIdsContains(user.getId())
+                .stream()
+                .map(Group::getId)
+                .collect(Collectors.toSet());
+
+        // Check if the document's categories are assigned to the user's groups
+        for (Category category : documentVersion.getCategories()) {
+            for (Long groupId : category.getGroupIds()) {
+                if (userGroupIds.contains(groupId)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public DocumentVersionResponseDTO getDocumentVersion(Long id) {
