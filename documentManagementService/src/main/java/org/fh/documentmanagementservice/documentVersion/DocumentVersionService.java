@@ -90,7 +90,7 @@ public class DocumentVersionService {
         }
 
         List<DocumentVersionResponseDTO> filteredAndMappedDocumentVersions = documentVersions.stream()
-                .filter(documentVersion -> isDocumentAssignedToUser(documentVersion, user))
+                .filter(documentVersion -> isDocumentAssignedToUser(documentVersion, user) && documentVersion.getIsVisible() && documentVersion.getIsRead())
                 .map(this::convertToResponseDTO)
                 .map(dto -> {
                     dto.setOldVersions(getNonLatestDocumentVersionsDTO(dto.getDocumentName()).toArray(new DocumentOldVersionResponseDTO[0]));
@@ -108,7 +108,7 @@ public class DocumentVersionService {
         Page<DocumentVersion> documentVersions = documentVersionRepository.findByIsLatestTrue(pageable);
 
         List<DocumentVersionResponseDTO> unreadDocumentVersions = documentVersions.stream()
-                .filter(documentVersion -> isDocumentAssignedToUser(documentVersion, user) && !documentVersion.getIsRead())
+                .filter(documentVersion -> isDocumentAssignedToUser(documentVersion, user) && documentVersion.getIsVisible() && !documentVersion.getIsRead())
                 .map(this::convertToResponseDTO)
                 .map(dto -> {
                     dto.setOldVersions(getNonLatestDocumentVersionsDTO(dto.getDocumentName()).toArray(new DocumentOldVersionResponseDTO[0]));
