@@ -89,13 +89,16 @@ public class DocumentVersionService {
             documentVersions = documentVersionRepository.findByDocumentNameStartingWithIgnoreCaseAndIsLatestTrue(search, pageable);
         }
 
-        return (Page<DocumentVersionResponseDTO>) documentVersions
+        List<DocumentVersionResponseDTO> filteredAndMappedDocumentVersions = documentVersions.stream()
                 .filter(documentVersion -> isDocumentAssignedToUser(documentVersion, user))
                 .map(this::convertToResponseDTO)
                 .map(dto -> {
                     dto.setOldVersions(getNonLatestDocumentVersionsDTO(dto.getDocumentName()).toArray(new DocumentOldVersionResponseDTO[0]));
                     return dto;
-                });
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(filteredAndMappedDocumentVersions, pageable, filteredAndMappedDocumentVersions.size());
     }
 
     private boolean isDocumentAssignedToUser(DocumentVersion documentVersion, User user) {
