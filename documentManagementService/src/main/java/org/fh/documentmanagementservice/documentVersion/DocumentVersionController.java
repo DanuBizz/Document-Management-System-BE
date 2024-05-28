@@ -42,6 +42,13 @@ public class DocumentVersionController {
     public ResponseEntity<Page<DocumentVersionResponseDTO>> getLatestDocumentVersions(@RequestParam(defaultValue = "") String search, Pageable pageable) {
         return ResponseEntity.ok(documentVersionService.getLatestWithAssociatedVersionsDTO(search, pageable));
     }
+
+    @GetMapping("/user-latest-with-associated-versions")
+    public ResponseEntity<Page<DocumentVersionResponseDTO>> getLatestDocumentVersionsForUser(
+            @RequestParam String userName, @RequestParam(defaultValue = "") String search, Pageable pageable) {
+        return ResponseEntity.ok(documentVersionService.getLatestWithAssociatedVersionsDTOForUser(userName, search, pageable));
+    }
+
     /**
      * Upload a document version.
      * @param requestDTO
