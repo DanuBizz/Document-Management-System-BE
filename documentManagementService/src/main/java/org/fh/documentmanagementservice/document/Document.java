@@ -1,5 +1,6 @@
 package org.fh.documentmanagementservice.document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.fh.documentmanagementservice.documentVersion.DocumentVersion;
@@ -28,5 +29,6 @@ public class Document {
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private List<DocumentVersion> versions = new ArrayList<>();
 }
