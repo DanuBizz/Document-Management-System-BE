@@ -11,6 +11,8 @@ import org.fh.documentmanagementservice.group.GroupRepository;
 import org.fh.documentmanagementservice.user.User;
 import org.fh.documentmanagementservice.group.Group;
 import org.fh.documentmanagementservice.user.UserRepository;
+import org.fh.documentmanagementservice.userDocumentRead.UserDocumentRead;
+import org.fh.documentmanagementservice.userDocumentRead.UserDocumentReadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -59,6 +61,8 @@ public class DocumentVersionService {
     private UserRepository userRepository;
 
     private static final Logger LOGGER = Logger.getLogger(DocumentVersionService.class.getName());
+    @Autowired
+    private UserDocumentReadRepository userDocumentReadRepository;
 
     public Page<DocumentVersionResponseDTO> getAllDocumentVersionsDTO(Pageable pageable) {
         return documentVersionRepository.findAll(pageable).map(this::convertToResponseDTO);
@@ -89,23 +93,42 @@ public class DocumentVersionService {
             documentVersions = documentVersionRepository.findByDocumentNameStartingWithIgnoreCaseAndIsLatestTrue(search, pageable);
         }
 
-        return (Page<DocumentVersionResponseDTO>) documentVersions
-                .filter(documentVersion -> isDocumentAssignedToUser(documentVersion, user))
+        List<DocumentVersionResponseDTO> filteredAndMappedDocumentVersions = documentVersions.stream()
+                .filter(documentVersion -> isDocumentAssignedToUser(documentVersion, user) && documentVersion.getIsVisible() && isReadByUser(documentVersion, user))
                 .map(this::convertToResponseDTO)
                 .map(dto -> {
                     dto.setOldVersions(getNonLatestDocumentVersionsDTO(dto.getDocumentName()).toArray(new DocumentOldVersionResponseDTO[0]));
                     return dto;
-                });
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(filteredAndMappedDocumentVersions, pageable, filteredAndMappedDocumentVersions.size());
+    }
+
+    public Page<DocumentVersionResponseDTO> getUnreadDocumentsForUser(String userName, Pageable pageable) {
+        User user = userRepository.findByUsername(userName)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user name"));
+
+        Page<DocumentVersion> documentVersions = documentVersionRepository.findByIsLatestTrue(pageable);
+
+        List<DocumentVersionResponseDTO> unreadDocumentVersions = documentVersions.stream()
+                .filter(documentVersion -> isDocumentAssignedToUser(documentVersion, user) && documentVersion.getIsVisible() && !isReadByUser(documentVersion, user))
+                .map(this::convertToResponseDTO)
+                .map(dto -> {
+                    dto.setOldVersions(getNonLatestDocumentVersionsDTO(dto.getDocumentName()).toArray(new DocumentOldVersionResponseDTO[0]));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(unreadDocumentVersions, pageable, unreadDocumentVersions.size());
     }
 
     private boolean isDocumentAssignedToUser(DocumentVersion documentVersion, User user) {
-        // Check if the document is assigned to the user's groups
         Set<Long> userGroupIds = groupRepository.findAllByUserIdsContains(user.getId())
                 .stream()
                 .map(Group::getId)
                 .collect(Collectors.toSet());
 
-        // Check if the document's categories are assigned to the user's groups
         for (Category category : documentVersion.getCategories()) {
             for (Long groupId : category.getGroupIds()) {
                 if (userGroupIds.contains(groupId)) {
@@ -114,6 +137,11 @@ public class DocumentVersionService {
             }
         }
         return false;
+    }
+
+    private boolean isReadByUser(DocumentVersion documentVersion, User user) {
+        List<UserDocumentRead> userDocumentReads = userDocumentReadRepository.findByUserAndDocumentVersion(user, documentVersion);
+        return userDocumentReads.stream().anyMatch(UserDocumentRead::getHasRead);
     }
 
     public DocumentVersionResponseDTO getDocumentVersion(Long id) {
@@ -250,7 +278,7 @@ public class DocumentVersionService {
                 .filepath(documentVersion.getFilepath())
                 .timestamp(documentVersion.getTimestamp())
                 .categoryNames(categoryNames)
-                .isRead(documentVersion.getIsRead())
+                .isRead(false) // Placeholder, should be set correctly in the endpoint methods if needed
                 .isLatest(documentVersion.getIsLatest())
                 .isVisible(documentVersion.getIsVisible())
                 .oldVersions(new DocumentOldVersionResponseDTO[0])

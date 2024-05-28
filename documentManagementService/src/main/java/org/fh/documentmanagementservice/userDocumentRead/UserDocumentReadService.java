@@ -32,10 +32,15 @@ public class UserDocumentReadService {
      */
     @Transactional
     public UserDocumentReadResponseDTO markDocumentAsRead(UserDocumentReadRequestDTO request) {
-        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
-        DocumentVersion documentVersion = documentVersionRepository.findById(request.getDocumentVersionId()).orElseThrow(() -> new RuntimeException("Document version not found"));
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        DocumentVersion documentVersion = documentVersionRepository.findById(request.getDocumentVersionId())
+                .orElseThrow(() -> new RuntimeException("Document version not found"));
 
-        UserDocumentRead userDocumentRead = new UserDocumentRead();
+        UserDocumentRead userDocumentRead = userDocumentReadRepository.findByUserAndDocumentVersion(user, documentVersion)
+                .stream().findFirst()
+                .orElse(new UserDocumentRead());
+
         userDocumentRead.setUser(user);
         userDocumentRead.setDocumentVersion(documentVersion);
         userDocumentRead.setHasRead(true);
