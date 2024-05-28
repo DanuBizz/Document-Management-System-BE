@@ -101,14 +101,30 @@ public class DocumentVersionService {
         return new PageImpl<>(filteredAndMappedDocumentVersions, pageable, filteredAndMappedDocumentVersions.size());
     }
 
+    public Page<DocumentVersionResponseDTO> getUnreadDocumentsForUser(String userName, Pageable pageable) {
+        User user = userRepository.findByUsername(userName)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user name"));
+
+        Page<DocumentVersion> documentVersions = documentVersionRepository.findByIsLatestTrue(pageable);
+
+        List<DocumentVersionResponseDTO> unreadDocumentVersions = documentVersions.stream()
+                .filter(documentVersion -> isDocumentAssignedToUser(documentVersion, user) && !documentVersion.getIsRead())
+                .map(this::convertToResponseDTO)
+                .map(dto -> {
+                    dto.setOldVersions(getNonLatestDocumentVersionsDTO(dto.getDocumentName()).toArray(new DocumentOldVersionResponseDTO[0]));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(unreadDocumentVersions, pageable, unreadDocumentVersions.size());
+    }
+
     private boolean isDocumentAssignedToUser(DocumentVersion documentVersion, User user) {
-        // Check if the document is assigned to the user's groups
         Set<Long> userGroupIds = groupRepository.findAllByUserIdsContains(user.getId())
                 .stream()
                 .map(Group::getId)
                 .collect(Collectors.toSet());
 
-        // Check if the document's categories are assigned to the user's groups
         for (Category category : documentVersion.getCategories()) {
             for (Long groupId : category.getGroupIds()) {
                 if (userGroupIds.contains(groupId)) {
