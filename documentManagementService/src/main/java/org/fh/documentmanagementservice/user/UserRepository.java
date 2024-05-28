@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository interface for User related operations.
@@ -20,4 +21,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByUserUsername(String userLogonName);
     List<User> findAllByUsernameIn(List<String> usernames);
     Page<User> findByUsernameStartingWithIgnoreCase(String username, Pageable pageable);
+    Optional<User> findByUsername(String username);
 }
