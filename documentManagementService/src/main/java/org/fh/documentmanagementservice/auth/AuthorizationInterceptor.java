@@ -33,8 +33,8 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        System.out.println(request.getHeader("Authorization"));
         headers.add("Authorization", request.getHeader("Authorization"));
+        headers.add("X-Csrf-Token", request.getHeader("X-Csrf-Token"));
         try {
             ResponseEntity<String> userControlResponse = restTemplate.exchange(userControlUrl, HttpMethod.GET, new HttpEntity<>(headers), String.class);
             if (userControlResponse.getStatusCode().is2xxSuccessful()) {

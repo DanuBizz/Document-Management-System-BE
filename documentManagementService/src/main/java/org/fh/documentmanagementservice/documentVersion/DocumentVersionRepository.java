@@ -7,7 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-
+/**
+ * Repository interface for DocumentVersion related operations.
+ * This interface extends JpaRepository and provides methods for CRUD operations on DocumentVersion entities.
+ */
 public interface DocumentVersionRepository extends JpaRepository<DocumentVersion, Long> {
     Page<DocumentVersion> findByIsLatestTrue(Pageable pageable);
 

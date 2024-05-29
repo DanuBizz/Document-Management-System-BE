@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-
+/**
+ * This class represents the category request DTO.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

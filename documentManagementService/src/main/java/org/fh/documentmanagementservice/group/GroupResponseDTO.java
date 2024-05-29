@@ -6,7 +6,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-
+/**
+ * Data Transfer Object (DTO) for Group responses.
+ * This class is used to transfer data between the server and the client during HTTP responses.
+ * It includes the necessary information to represent a Group in the response.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

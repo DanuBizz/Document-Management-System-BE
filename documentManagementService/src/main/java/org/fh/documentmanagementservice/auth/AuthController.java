@@ -3,8 +3,10 @@ package org.fh.documentmanagementservice.auth;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     /**
      * Get user control.
-     * @return
+     * @return User accepted!
      */
     @GetMapping
     public String getUserControl() {
@@ -24,7 +26,7 @@ public class AuthController {
 
     /**
      * Post credentials.
-     * @return
+     * @return HttpStatus.OK
      */
     @PostMapping
     public HttpStatus postCredentials() {
@@ -35,7 +37,7 @@ public class AuthController {
      * @param request
      * @param response
      * @param authentication
-     * @return
+     * @return HttpStatus.OK
      */
     @GetMapping(path = "/logout")
     public HttpStatus logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
@@ -43,5 +45,15 @@ public class AuthController {
             new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
         return HttpStatus.OK;
+    }
+    /**
+     * Get CSRF token.
+     * @param request
+     * @return CSRF token
+     */
+    @GetMapping("/csrf")
+    public ResponseEntity<String> getCsrfToken(HttpServletRequest request) {
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        return ResponseEntity.ok(csrfToken.getToken());
     }
 }

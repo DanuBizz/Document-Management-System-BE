@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -60,36 +62,51 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Configures the CORS mappings for the application.
-     * It accepts a CorsRegistry object and configures the allowed origins, methods, headers, and credentials.
-     * @param registry The CorsRegistry object to configure.
+     * Configures the security filter chain for the application.
+     * This method configures the security filter chain for the application, allowing any requests if the user is authenticated.
+     * @param http The HttpSecurity object to configure.
+     * @return The SecurityFilterChain object.
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(request -> corsConfigurationSource())
-                .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().authenticated()) // allow any requests, but only if the user is authenticated
-                .httpBasic(Customizer.withDefaults()); // use basic authentication with default (autowired) configuration
+                        .requestMatchers("/usercontrol/csrf").permitAll()
+                        .anyRequest().authenticated())// allow any requests, but only if the user is authenticated
+                .httpBasic(Customizer.withDefaults()) // use basic authentication with default (autowired) configuration
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(csrfTokenRepository())
+                );
         return http.build();
     }
-
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        return CookieCsrfTokenRepository.withHttpOnlyFalse();
+    }
+    /**
+     * Configures the CORS settings for the application.
+     *
+     * @return The CorsConfigurationSource object.
+     */
     // since cors is not enabled by default, do not allow any requests from cross-origins
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-CSRF-TOKEN"));
         configuration.setAllowCredentials(true);
         //configuration.setAllowedOrigins(Collections.emptyList());
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-        //return new UrlBasedCorsConfigurationSource();
     }
-
+    /**
+     * Configures the authentication manager for the application.
+     * This method configures the authentication manager for the application, using the ActiveDirectoryLdapAuthenticationProvider if the application is in production.
+     * @param auth The AuthenticationManagerBuilder object to configure.
+     */
     // default configuration for authentication
     @Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -117,7 +134,11 @@ public class WebConfig implements WebMvcConfigurer {
                     .roles("USER");
         }
     }
-
+    /**
+     * Configures the UserDetailsService for the application.
+     * This method configures the UserDetailsService for the application, returning an InMemoryUserDetailsManager.
+     * @return The UserDetailsService object.
+     */
     // to stop Spring from auto-generating security passwords
     @Bean
     public UserDetailsService userDetailsService() {
@@ -133,5 +154,4 @@ public class WebConfig implements WebMvcConfigurer {
         }
         return false;
     }
-
 }

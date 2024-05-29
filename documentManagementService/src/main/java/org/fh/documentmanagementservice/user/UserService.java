@@ -17,7 +17,10 @@ import javax.naming.NamingException;
 import javax.naming.directory.*;
 import java.util.*;
 import java.util.stream.Collectors;
-
+/**
+ * Service class for User related operations.
+ * This class contains the business logic for processing User data.
+ */
 @Service
 public class UserService {
 
@@ -130,7 +133,12 @@ public class UserService {
             throw new RuntimeException("User not found with id: " + id);
         }
     }
-
+    /**
+     * Converts a User object to a UserResponseDTO object.
+     *
+     * @param user User object to convert.
+     * @return UserResponseDTO object representing the user.
+     */
     private UserResponseDTO convertToUserResponseDTO(User user) {
         UserResponseDTO userResponseDTO = new UserResponseDTO();
         userResponseDTO.setId(user.getId());
@@ -242,7 +250,13 @@ public class UserService {
     }
 
     // ####################### Active Directory #######################
-
+    /**
+     * Retrieves user data from Active Directory based on the username.
+     *
+     * @param username The username of the user to retrieve.
+     * @return User object representing the user data.
+     * @throws Exception if the user data cannot be retrieved.
+     */
     private User getActiveDirectoryUserData(String username) throws Exception {
         DirContext context = getActiveDirectoryContext();
         NamingEnumeration<SearchResult> results = getActiveDirectorySearchResult(context);
@@ -256,7 +270,12 @@ public class UserService {
         context.close();
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found in Active Directory!");
     }
-
+    /**
+     * Retrieves all user data from Active Directory.
+     *
+     * @param activeDirectoryUserList List to populate with Active Directory user data.
+     * @throws Exception if user data cannot be retrieved.
+     */
     private void addAllActiveDirectoryMembersToList(List<User> activeDirectoryUserList) throws Exception {
         DirContext context = getActiveDirectoryContext();
         NamingEnumeration<SearchResult> results = getActiveDirectorySearchResult(context);
@@ -266,21 +285,31 @@ public class UserService {
         }
         context.close();
     }
-
+    /**
+     * Retrieves Context from Active Directory and binding password from a CSV file.
+     *
+     * @return The Active Directory binding password.
+     * @throws Exception if the password cannot be read from the file.
+     */
     private DirContext getActiveDirectoryContext() throws Exception {
         //String username = activeDirectoryBindingUser;
         //String password = readActiveDirectoryBindingPassword();
 
         Hashtable<String, String> env = new Hashtable<>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, "ldap://localhost:8389/");
+        env.put(Context.PROVIDER_URL, "ldap://localhost:8389/"); // !!!! CHANGE THIS TO activeDirectoryUrl
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         //env.put(Context.SECURITY_PRINCIPAL, username);
         //env.put(Context.SECURITY_CREDENTIALS, password);
 
         return new InitialDirContext(env);
     }
-
+    /**
+     * Retrieves Active Directory Search Result.
+     * @param context The DirContext object.
+     * @return NamingEnumeration of SearchResult.
+     * @throws NamingException if the search result cannot be retrieved.
+     */
     private NamingEnumeration<SearchResult> getActiveDirectorySearchResult(DirContext context) throws NamingException {
         String searchBase = activeDirectorySearchBase;
         String searchFilter = activeDirectorySearchFilter;
@@ -298,10 +327,16 @@ public class UserService {
 
         return context.search(searchBase, searchFilter, controls);
     }
-
+    /**
+     * Retrieves User data from Active Directory Search Result.
+     *
+     * @param searchResult The SearchResult from Active Directory.
+     * @return User object representing the user data.
+     * @throws NamingException if the user data cannot be retrieved.
+     */
     private User getUserDataFromActiveDirectorySearchResult(SearchResult searchResult) throws NamingException {
         Attributes attributes = searchResult.getAttributes();
-
+        // CHANGE THIS TO ACTIVE
         /*Attribute userPrincipalNameAttr = attributes.get("userPrincipalName");
         String userPrincipalName = (userPrincipalNameAttr != null) ? (String) userPrincipalNameAttr.get() : null;
         if (userPrincipalName != null) {
@@ -317,8 +352,11 @@ public class UserService {
 
         return new User(firstName, email, false);
     }
-
-
+    /**
+     * Toggle the admin status of a user.
+     * @param id The ID of the user.
+     * @return UserResponseDTO representing the updated user.
+     */
     public UserResponseDTO toggleUserAdminStatus(Long id) {
         Optional<User> userOptional = userRepository.findById(id);
 
@@ -333,12 +371,21 @@ public class UserService {
             throw new RuntimeException("User not found with id: " + id);
         }
     }
-
+    /**
+     * Search for users.
+     * @param search The search query.
+     * @param pageable Pagination information.
+     * @return Page of UserResponseDTO representing the search results.
+     */
     public Page<UserResponseDTO> searchUsers(String search, Pageable pageable) {
         Page<User> userPage = userRepository.findByUsernameStartingWithIgnoreCase(search, pageable);
         return userPage.map(this::convertToUserResponseDTO);
     }
-
+    /**
+     * Updates the groups of a user.
+     * @param userId The ID of the user.
+     * @param groupIds The IDs of the groups.
+     */
     public void updateUserGroups(Long userId, List<Long> groupIds) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));

@@ -8,7 +8,11 @@ import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
-
+/**
+ * Entity class for Group.
+ * This class represents the Group entity in the database.
+ * It includes the necessary information to represent a Group in the database.
+ */
 @Entity
 @Table(name = "groups")
 @Getter
