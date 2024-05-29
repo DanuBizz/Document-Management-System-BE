@@ -3,8 +3,10 @@ package org.fh.documentmanagementservice.auth;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,5 +45,15 @@ public class AuthController {
             new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
         return HttpStatus.OK;
+    }
+    /**
+     * Get CSRF token.
+     * @param request
+     * @return CSRF token
+     */
+    @GetMapping("/csrf")
+    public ResponseEntity<String> getCsrfToken(HttpServletRequest request) {
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        return ResponseEntity.ok(csrfToken.getToken());
     }
 }

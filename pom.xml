@@ -17,6 +17,7 @@
     <build>
         <plugins>
             <plugin>
+                <!-- Add Lombok Plugin for better Code Quality -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
@@ -29,6 +30,7 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!-- Add Checkstyle Plugin for better Code Quality (Linter) -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.3.1</version>
@@ -49,8 +51,8 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Add PMD Plugin for better Code Quality (Linter) -->
             <plugin>
+                <!-- Add PMD Plugin for better Code Quality (Linter) -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>3.21.2</version>
@@ -71,5 +73,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

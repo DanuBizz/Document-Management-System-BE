@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -69,11 +71,18 @@ public class WebConfig implements WebMvcConfigurer {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(request -> corsConfigurationSource())
-                .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().authenticated()) // allow any requests, but only if the user is authenticated
-                .httpBasic(Customizer.withDefaults()); // use basic authentication with default (autowired) configuration
+                        .requestMatchers("/usercontrol/csrf").permitAll()
+                        .anyRequest().authenticated())// allow any requests, but only if the user is authenticated
+                .httpBasic(Customizer.withDefaults()) // use basic authentication with default (autowired) configuration
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(csrfTokenRepository())
+                );
         return http.build();
+    }
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        return CookieCsrfTokenRepository.withHttpOnlyFalse();
     }
     /**
      * Configures the CORS settings for the application.
@@ -86,13 +95,12 @@ public class WebConfig implements WebMvcConfigurer {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-CSRF-TOKEN"));
         configuration.setAllowCredentials(true);
         //configuration.setAllowedOrigins(Collections.emptyList());
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-        //return new UrlBasedCorsConfigurationSource();
     }
     /**
      * Configures the authentication manager for the application.
