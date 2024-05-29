@@ -49,6 +49,12 @@ public class DocumentVersionController {
         return ResponseEntity.ok(documentVersionService.getLatestWithAssociatedVersionsDTOForUser(userName, search, pageable));
     }
 
+    @GetMapping("/user-unread-documents")
+    public ResponseEntity<Page<DocumentVersionResponseDTO>> getUnreadDocumentsForUser(
+            @RequestParam String userName, Pageable pageable) {
+        return ResponseEntity.ok(documentVersionService.getUnreadDocumentsForUser(userName, pageable));
+    }
+
     /**
      * Upload a document version.
      * @param requestDTO
