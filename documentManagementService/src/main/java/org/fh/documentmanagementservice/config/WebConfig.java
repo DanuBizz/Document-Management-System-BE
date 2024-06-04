@@ -15,6 +15,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -77,6 +78,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .httpBasic(Customizer.withDefaults()) // use basic authentication with default (autowired) configuration
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(csrfTokenRepository())
+                        .ignoringRequestMatchers(new AntPathRequestMatcher("/**"))
                 );
         return http.build();
     }
