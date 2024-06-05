@@ -234,7 +234,22 @@ Make sure the version is JDK 17 or later.
 ```bash
 docker-compose up
 ```
+##### Option 3
 
+- Open the command prompt.
+- Navigate to the project folder.
+- Run mvn clean package to build the project.
+```bash
+mvn -B clean package
+```
+- Run the built .jar file with the following command:
+```bash
+java -jar target/documentManagementService-0.0.1-SNAPSHOT.jar
+```
+- Run the mariaDB container with the following command:
+```bash
+docker-compose up mariadb
+```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
