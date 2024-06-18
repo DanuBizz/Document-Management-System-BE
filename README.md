@@ -1,6 +1,6 @@
 <div id="readme-top"></div>
 <div align="center">
-  <h1>Document-Managment-System</h1>
+  <h1>Document-Management-System-BE</h1>
 </div>
 
 <br />
