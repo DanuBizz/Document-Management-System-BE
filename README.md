@@ -1,12 +1,11 @@
 <div id="readme-top"></div>
 <div align="center">
-  <a href="https://imgbb.com/"><img src="https://i.ibb.co/51J4TzV/logo.png" alt="logo" border="0"></a>
+  <h1>Document-Managment-System</h1>
 </div>
 
 <br />
 <div align="center">
-  <h1 align="center">Kultur Betriebe Burgenland</h1>
-  <h3 align="center">Backend für die Entwicklung der Web-Applikation Kultur Betriebe Burgenland</h3>
+  <h3 align="center">Backend Development for Document-Management-System Web-Application</h3>
 </div>
 
 <!-- TABLE OF CONTENTS -->
@@ -119,10 +118,10 @@ services:
     image: mariadb:10.5
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: documentDB
-      MYSQL_USER: KBB-dev
-      MYSQL_PASSWORD: documentDB-pw
+      MYSQL_ROOT_PASSWORD: yourrootpassword
+      MYSQL_DATABASE: yourdatabase
+      MYSQL_USER: yourusername
+      MYSQL_PASSWORD: yourpassword
     volumes:
       - ./data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -151,9 +150,9 @@ services:
       mailhog:
         condition: service_started
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/documentDB
-      SPRING_DATASOURCE_USERNAME: KBB-dev
-      SPRING_DATASOURCE_PASSWORD: documentDB-pw
+      SPRING_DATASOURCE_URL: yourdatasourceurl
+      SPRING_DATASOURCE_USERNAME: yourusername
+      SPRING_DATASOURCE_PASSWORD: yourpassword
       SPRING_MAIL_HOST: mailhog
       SPRING_MAIL_PORT: 1025
     ports:
@@ -164,7 +163,7 @@ services:
 
 In a parallel project, an Angular application was developed. This application manages the entire user interface, including functionalities like login, document management, and user management.
 
-- Link to GitHub Repo: [GitHub Repo](https://github.com/DanuBizz/KulturBetriebeBurgenland-FE)
+- Link to GitHub Repo: [GitHub Repo](https://github.com/DanuBizz/Document-Management-System-FE)
 
 ## Built With
 
@@ -216,7 +215,7 @@ Make sure the version is JDK 17 or later.
 #### Clone the repository
 
 ```bash
-- git clone https://github.com/DanuBizz/KulturBetriebeBurgenland-BE.git
+- git clone https://github.com/DanuBizz/Document-Management-System-BE.git
 ```
 #### Run Application
 
