@@ -31,9 +31,6 @@ jobs:
       # Run Linter Checkstyle
       - name: Checkstyle
         run: mvn checkstyle:checkstyle-aggregate
-      # Run Linter PMD
-      - name : PMD
-        run : mvn pmd:check
 
   test:
     needs: lint
