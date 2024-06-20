@@ -61,7 +61,6 @@
                     <printFailingErrors>true</printFailingErrors>
                     <rulesets>
                         <failsOnError>false</failsOnError>
-                        <linkXRef>false</linkXRef>
                         <ruleset>pmd.xml</ruleset>
                     </rulesets>
                 </configuration>
