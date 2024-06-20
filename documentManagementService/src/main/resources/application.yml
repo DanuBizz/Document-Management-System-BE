@@ -1,10 +1,10 @@
 spring:
   application:
     name: DocumentManagementService  # Name of the Spring application
-    file-directory: "C:\\Users\\Hasnat\\Downloads\\KBB-test\\"
+    file-directory: "C:\\YOUR\\CUSTOM\\PATH\\" # Path to the directory where files are stored
   datasource:
     url: jdbc:mariadb://localhost:3306/documentDB  # URL for the MariaDB datasource
-    username: KBB-dev  # Username for database connection
+    username: documentDB-dev  # Username for database connection
     password: documentDB-pw  # Password for database connection
     driver-class-name: org.mariadb.jdbc.Driver  # JDBC driver class name
   jpa:
@@ -69,6 +69,6 @@ path: # Path to the file that contains the active directory binding password
 
 logging:
   level:
-    root: DEBUG  # Root logging level
-    org.springframework: DEBUG  # Logging level for Spring framework
-    org.springframework.data.rest: DEBUG  # Logging level for Spring Data REST
+    root: INFO  # Root logging level
+    org.springframework: INFO  # Logging level for Spring framework
+    org.springframework.data.rest: INFO  # Logging level for Spring Data REST

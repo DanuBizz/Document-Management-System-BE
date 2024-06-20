@@ -7,7 +7,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: documentDB
-      MYSQL_USER: KBB-dev
+      MYSQL_USER: documentDB-dev
       MYSQL_PASSWORD: documentDB-pw
     volumes:
       - ./data:/var/lib/mysql
@@ -38,7 +38,7 @@ services:
         condition: service_started
     environment:
       SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/documentDB
-      SPRING_DATASOURCE_USERNAME: KBB-dev
+      SPRING_DATASOURCE_USERNAME: documentDB-dev
       SPRING_DATASOURCE_PASSWORD: documentDB-pw
       SPRING_MAIL_HOST: mailhog
       SPRING_MAIL_PORT: 1025
